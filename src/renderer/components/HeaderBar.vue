@@ -25,6 +25,7 @@
         line-height: 40px;
         background-color: #232323;
         height: 100%;
+        box-shadow: 0 10px 0 rgba(0,0,0,.55);
     }
 
     .header .input-search {

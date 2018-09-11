@@ -11,18 +11,17 @@
                 <el-col :span="12">分类</el-col>
                 <el-col :span="2" :push="8" @click.native="newCategory">+</el-col>
             </el-row>
-            <ul>
-                <transition-group name="bounce"
-                                  enter-active-class="bounceInLeft"
-                                  leave-active-class="bounceOutRight">
-                    <li v-for="(o, index) in categoryList"
-                        :key="index"
-                        @click="showItemList(o._id, 'note')"
-                        :class="o._id === activeSidebar ? 'active' : ''">
-                        {{o.name}}
-                    </li>
-                </transition-group>
-            </ul>
+            <transition-group name="bounce"
+                              enter-active-class="bounceInLeft"
+                              leave-active-class="bounceOutRight"
+                              tag="ul">
+                <li v-for="(o, index) in categoryList"
+                    :key="index"
+                    @click="showItemList(o._id, 'note')"
+                    :class="o._id === activeSidebar ? 'active' : ''">
+                    {{o.name}}
+                </li>
+            </transition-group>
         </div>
     </div>
 </template>

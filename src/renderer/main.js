@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 import store from './store'
 import db from './db'
+
 Vue.prototype.$db = db
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))

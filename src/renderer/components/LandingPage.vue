@@ -32,9 +32,14 @@
     }
 </script>
 
-<style>
+<style lang="scss">
+    @import "~vue2-animate/src/sass/vue2-animate.scss";
 
     .el-header {
+        padding: 0;
+    }
+
+    .el-main {
         padding: 0;
     }
 </style>

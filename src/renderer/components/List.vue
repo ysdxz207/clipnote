@@ -1,10 +1,11 @@
 <template>
-    <div>
-        <ul>
-            <li v-for="(item, index) in itemList" :key="index">
-                {{item.title}}
+    <div class="list">
+        <transition-group name="fadeLeft" tag="ul">
+            <li v-for="(item, index) in itemList"
+                :key="index">
+            {{item.title}}
             </li>
-        </ul>
+        </transition-group>
         <el-button class="btn-edit"
                    type="success"
                    icon="el-icon-edit"
@@ -58,13 +59,23 @@
     }
 </script>
 
-<style>
+<style lang="scss">
+    @import "~vue2-animate/src/sass/vue2-animate.scss";
 
-    ul {
+    .list {
+        margin-top: 20px;
+    }
+    .list ul {
         list-style: none;
         margin: 0;
         padding: 0;
     }
+
+    .list li {
+        line-height: 30px;
+        border-bottom: 1px solid #EFEFEF;
+    }
+
     .btn-edit {
         opacity: 0.3;
         position: fixed;
