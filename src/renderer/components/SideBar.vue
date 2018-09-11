@@ -1,7 +1,7 @@
 <template>
     <div class="sidebar">
         <div class="item favourites">
-            <i class=""></i> 收藏
+            <i class=""></i> 收藏夹
         </div>
         <div class="item clipboard">
             剪贴板
@@ -12,9 +12,16 @@
                 <el-col :span="2" :push="8" @click.native="newCategory">+</el-col>
             </el-row>
             <ul>
-                <li v-for="(o, index) in categoryList">
-                    {{o.name}}
-                </li>
+                <transition-group name="bounce"
+                                  enter-active-class="bounceInLeft"
+                                  leave-active-class="bounceOutRight">
+                    <li v-for="(o, index) in categoryList"
+                        :key="index"
+                        @click="showItemList(o._id, 'note')"
+                        :class="o._id === activeSidebar ? 'active' : ''">
+                        {{o.name}}
+                    </li>
+                </transition-group>
             </ul>
         </div>
     </div>
@@ -26,15 +33,32 @@
         },
         data() {
             return {
+                activeSidebar: '',
                 categoryList: []
             }
         },
+        watch: {
+            '$route' (to, from) {
+                let categoryId = this.$route.query.categoryId
+                if (categoryId) {
+                    this.activeSidebar = categoryId
+                }
+            }
+
+        },
         mounted() {
             let _this = this
-            _this.loadCategoryList()
+            _this.loadCategoryList((categoryList) => {
+                // 默认打开第一个分类下列表
+                if (categoryList[0]) {
+                    _this.showItemList(categoryList[0]._id, 'note')
+                }
+            })
+            // 选中第一个分类
+            _this.activeSidebar = _this.$route.query.categoryId
         },
         methods: {
-            loadCategoryList() {
+            loadCategoryList(callback) {
                 let _this = this
                 _this.$db.find({
                     type: 'category'
@@ -46,6 +70,9 @@
                         })
                     } else {
                         _this.categoryList = docs
+                        if (callback) {
+                            callback(_this.categoryList)
+                        }
                     }
                 })
             },
@@ -76,6 +103,9 @@
                 }).catch(() => {
                 })
             },
+            showItemList(_id, type) {
+                this.$router.push({name: 'list', query: {categoryId: _id, type: type}})
+            },
             edit() {
                 console.log()
             }
@@ -91,6 +121,10 @@
         border-right: 1px solid #ECECEC;
     }
 
+    .sidebar .active {
+        background-color: rgb(225, 255, 230);
+    }
+
     .sidebar .item {
         line-height: 28px;
         border-bottom: 1px solid #DDD;
@@ -100,7 +134,6 @@
 
     .sidebar .category {
         line-height: 34px;
-        padding-left: 10px;
     }
 
     .sidebar .category ul {
@@ -113,6 +146,7 @@
         cursor: pointer;
         line-height: 24px;
         font-size: 14px;
+        padding-left: 10px;
     }
 
 

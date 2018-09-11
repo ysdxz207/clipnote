@@ -4,6 +4,7 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
 import Index from '@/components/LandingPage'
+import List from '@/components/List'
 import Edit from '@/components/Edit'
 
 Vue.use(Router)
@@ -17,8 +18,15 @@ export default new Router({
             component: Index,
             children: [
                 {
-                    name: 'edit',
+                    name: 'list',
                     path: '',
+                    components: {
+                        default: List
+                    }
+                },
+                {
+                    name: 'edit',
+                    path: 'edit',
                     components: {
                         default: Edit
                     }
