@@ -1,15 +1,30 @@
 <template>
     <div class="sidebar">
         <div class="item favourites">
-            <i class=""></i> 收藏夹
+            <svg class="icon" aria-hidden="true">
+                <use xlink:href="#clipnote-icon-favourite"></use>
+            </svg>
+            <span class="title">收藏夹</span>
         </div>
         <div class="item clipboard">
-            剪贴板
+            <svg class="icon" aria-hidden="true">
+                <use xlink:href="#clipnote-icon-clipboard"></use>
+            </svg>
+            <span class="title">剪贴板</span>
         </div>
         <div class="category">
-            <el-row>
-                <el-col :span="12">分类</el-col>
-                <el-col :span="2" :push="8" @click.native="newCategory">+</el-col>
+            <el-row class="item">
+                <el-col :span="12">
+                    <svg class="icon" aria-hidden="true">
+                        <use xlink:href="#clipnote-icon-category"></use>
+                    </svg>
+                    <span class="title">分类</span>
+                </el-col>
+                <el-col :span="2" :push="8" @click.native="newCategory">
+                    <svg class="icon" aria-hidden="true">
+                        <use xlink:href="#clipnote-icon-add"></use>
+                    </svg>
+                </el-col>
             </el-row>
             <transition-group name="bounce"
                               enter-active-class="bounceInLeft"
@@ -93,10 +108,10 @@
                             })
                         } else {
                             _this.loadCategoryList()
-                            _this.$message({
-                                type: 'success',
-                                message: '添加成功'
-                            })
+                            // _this.$message({
+                            //     type: 'success',
+                            //     message: '添加成功'
+                            // })
                         }
                     })
                 }).catch(() => {
@@ -104,9 +119,6 @@
             },
             showItemList(_id, type) {
                 this.$router.push({name: 'list', query: {categoryId: _id, type: type}})
-            },
-            edit() {
-                console.log()
             }
         }
     }
@@ -121,13 +133,14 @@
     }
 
     .sidebar .active {
-        background-color: rgb(225, 255, 230);
+        background-color: rgb(255, 201, 177);
     }
 
     .sidebar .item {
         line-height: 28px;
         border-bottom: 1px solid #DDD;
-        padding-left: 10px;
+        padding-left: 16px;
+        cursor: pointer;
     }
 
 
@@ -148,5 +161,8 @@
         padding-left: 10px;
     }
 
+    .sidebar .title {
+        padding-left: 20px;
+    }
 
 </style>

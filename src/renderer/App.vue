@@ -11,6 +11,16 @@
 </script>
 
 <style lang="scss">
+    $animationDuration: 0.5s;
+    @import "~vue2-animate/src/sass/vue2-animate.scss";
+
+
+    .icon {
+        width: 1em; height: 1em;
+        vertical-align: -0.15em;
+        fill: currentColor;
+        overflow: hidden;
+    }
 
     html, body {
         margin: 0;

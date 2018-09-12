@@ -1,6 +1,6 @@
 <template>
     <el-container>
-        <el-aside width="26vw">
+        <el-aside width="200px">
             <side-bar></side-bar>
         </el-aside>
         <el-container>
@@ -33,13 +33,13 @@
 </script>
 
 <style lang="scss">
-    @import "~vue2-animate/src/sass/vue2-animate.scss";
 
     .el-header {
         padding: 0;
     }
 
     .el-main {
-        padding: 0;
+        padding: 24px 14px;
+        background-color: #F8F8F8;
     }
 </style>

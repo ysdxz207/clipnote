@@ -1,16 +1,18 @@
 <template>
-    <el-form ref="note" :model="note">
-        <el-form-item>
-            <el-input v-model="note.title"></el-input>
-        </el-form-item>
-        <el-form-item>
-            <el-input type="textarea" v-model="note.context"></el-input>
-        </el-form-item>
-        <el-form-item>
-            <el-button type="primary" @click="editNote">保存</el-button>
-            <el-button>取消</el-button>
-        </el-form-item>
-    </el-form>
+    <transition enter-active-class="bounceIn">
+        <el-form ref="note" :model="note">
+            <el-form-item>
+                <el-input size="mini" v-model="note.title"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-input type="textarea" v-model="note.context"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="success" @click="editNote" size="mini">保存</el-button>
+                <el-button @click="cancelEdit" size="mini">取消</el-button>
+            </el-form-item>
+        </el-form>
+    </transition>
 </template>
 
 <script>
@@ -18,37 +20,81 @@
         data() {
             return {
                 note: {
+                    _id: this.$route.query.id,
                     type: 'note',
                     categoryId: this.$route.query.categoryId
-                }
+                },
+                noteTemp: {}
             }
         },
         mounted() {
             let _this = this
-            console.log(_this.note)
+            if (_this.note._id) {
+                _this.loadNote()
+            }
         },
         methods: {
-            editNote() {
+            loadNote() {
                 let _this = this
-                _this.$db.insert(_this.note, (err, newDoc) => {
+                _this.$db.findOne({
+                    _id: _this.note._id
+                }, (err, docs) => {
                     if (err) {
                         _this.$message({
                             type: 'error',
-                            message: '添加笔记失败：' + err
+                            message: '笔记加载失败：' + err
                         })
                     } else {
-                        // 添加成功跳转到对应分类
-                        _this.$router.push({name: 'list', query: {type: _this.note.type, categoryId: _this.note.categoryId}})
-                        _this.$message({
-                            type: 'success',
-                            message: '添加笔记成功'
-                        })
+                        _this.note = docs
+                        _this.noteTemp = JSON.parse(JSON.stringify(docs))
                     }
                 })
+            },
+            editNote() {
+                let _this = this
+                if (_this.note._id) {
+                    _this.$db.update(_this.noteTemp, _this.note, {}, (err, num) => {
+                        console.log(num)
+                        if (err) {
+                            _this.$message({
+                                type: 'error',
+                                message: '修改笔记失败：' + err
+                            })
+                        } else {
+                            // 添加成功跳转到对应分类
+                            _this.$router.push({name: 'list', query: {type: _this.note.type, categoryId: _this.note.categoryId}})
+                            _this.$message({
+                                type: 'success',
+                                message: '修改笔记成功'
+                            })
+                        }
+                    })
+                } else {
+                    _this.$db.insert(_this.note, (err, newDoc) => {
+                        if (err) {
+                            _this.$message({
+                                type: 'error',
+                                message: '添加笔记失败：' + err
+                            })
+                        } else {
+                            // 添加成功跳转到对应分类
+                            _this.$router.push({name: 'list', query: {type: _this.note.type, categoryId: _this.note.categoryId}})
+                            // _this.$message({
+                            //     type: 'success',
+                            //     message: '添加笔记成功'
+                            // })
+                        }
+                    })
+                }
+            },
+            cancelEdit() {
+                let _this = this
+                _this.$router.push({name: 'list', query: {type: _this.note.type, categoryId: _this.note.categoryId}})
             }
         }
     }
 </script>
 
 <style>
+
 </style>

@@ -5,6 +5,8 @@ import App from './App'
 import router from './router'
 import store from './store'
 import db from './db'
+import './assets/icons/iconfont.css'
+import './assets/icons/iconfont.js'
 
 Vue.prototype.$db = db
 
