@@ -6,10 +6,16 @@
                 <span class="item-title" @click="editNote(item._id)">
                     {{item.title}}
                 </span>
-                <span class="btn-del" @click="deleteNote(item._id)">
-                    <svg class="icon" aria-hidden="true">
-                        <use xlink:href="#clipnote-icon-delete"></use>
-                    </svg>
+                <span class="item-btn-group">
+                    <span class="btn-favourite" @click="favouriteNote(item)">
+                        <i class="element-icons clipnote-icon-favourite"
+                           :style="item.favourite ? 'color: yellow' : 'color: grey'"></i>
+                    </span>
+                    <span class="btn-del" @click="deleteNote(item._id)">
+                        <svg class="icon" aria-hidden="true">
+                            <use xlink:href="#clipnote-icon-delete"></use>
+                        </svg>
+                    </span>
                 </span>
             </li>
         </ul>
@@ -48,10 +54,15 @@
         methods: {
             loadItemList() {
                 let _this = this
-                _this.$db.find({
-                    categoryId: this.categoryId,
+                let searchInfo = {
                     type: _this.type
-                }, (err, docs) => {
+                }
+                if (_this.categoryId === 'favourites') {
+                    searchInfo.favourite = true
+                } else {
+                    searchInfo.categoryId = _this.categoryId
+                }
+                _this.$db.find(searchInfo, (err, docs) => {
                     if (err) {
                         _this.$message({
                             type: 'error',
@@ -79,6 +90,7 @@
                                 message: '删除笔记失败：' + err
                             })
                         } else {
+                            _this.loadItemList()
                             _this.$message({
                                 type: 'success',
                                 message: '删除成功'
@@ -86,6 +98,21 @@
                         }
                     })
                 }).catch(() => {
+                })
+            },
+            favouriteNote(note) {
+                let _this = this
+                let noteTemp = JSON.parse(JSON.stringify(note))
+                note.favourite = !noteTemp.favourite
+                _this.$db.update(noteTemp, note, (err, numReplaced) => {
+                    if (err) {
+                        _this.$message({
+                            type: 'error',
+                            message: '收藏或取消收藏笔记失败：' + err
+                        })
+                    } else {
+                        _this.loadItemList()
+                    }
                 })
             }
         }
@@ -127,10 +154,22 @@
         opacity: 1;
     }
 
-    .btn-del {
+    .item-btn-group {
+        display: inline-block;
+        width: 20%;
         float: right;
-        margin-right: 10px;
+    }
+
+    .btn-del {
+        float: left;
         cursor: pointer;
+        margin-left: 24px;
+    }
+
+    .btn-favourite {
+        float: left;
+        cursor: pointer;
+        margin-left: 14px;
     }
 
     .no-data {

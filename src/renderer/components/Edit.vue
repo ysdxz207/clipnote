@@ -1,8 +1,8 @@
 <template>
-    <transition enter-active-class="bounceIn">
+    <transition enter-active-class="bounceIn" leave-active-class="zoomOutTop">
         <el-form ref="note" :model="note">
             <el-form-item>
-                <el-input size="mini" v-model="note.title"></el-input>
+                <el-input size="mini" v-model="note.title" autofocus></el-input>
             </el-form-item>
             <el-form-item>
                 <el-input type="textarea" v-model="note.context"></el-input>

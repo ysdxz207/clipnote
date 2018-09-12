@@ -24,6 +24,33 @@
             HeaderBar,
             SideBar
         },
+        mounted() {
+            let _this = this
+            const clipboard = require('electron-clipboard-extended')
+
+            clipboard
+                .on('text-changed', () => {
+                    let currentText = clipboard.readText()
+                    _this.$db.insert({
+                        categoryId: 'clipboard',
+                        type: 'note',
+                        context: currentText,
+                        title: currentText.substring(0, 20)
+                    }, (err, newDoc) => {
+                        if (err) {
+                            _this.$message({
+                                type: 'error',
+                                message: '收集粘贴板失败：' + err
+                            })
+                        }
+                    })
+                })
+                .on('image-changed', () => {
+                    let currentIMage = clipboard.readImage()
+                    console.log(currentIMage)
+                })
+                .startWatching()
+        },
         methods: {
             open(link) {
                 this.$electron.shell.openExternal(link)

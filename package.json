@@ -63,7 +63,8 @@
     "vuex": "^3.0.1",
     "element-ui": "^2.4.6",
     "vue2-animate": "^2.1.0",
-    "nedb": "^1.8.0"
+    "nedb": "^1.8.0",
+    "electron-clipboard-extended": "^1.1.1"
   },
   "devDependencies": {
     "ajv": "^6.5.0",

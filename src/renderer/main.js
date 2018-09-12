@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import axios from 'axios'
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
 
 import App from './App'
 import router from './router'
@@ -7,6 +9,8 @@ import store from './store'
 import db from './db'
 import './assets/icons/iconfont.css'
 import './assets/icons/iconfont.js'
+
+Vue.use(ElementUI)
 
 Vue.prototype.$db = db
 

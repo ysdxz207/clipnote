@@ -1,12 +1,18 @@
 <template>
     <div class="sidebar">
-        <div class="item favourites">
+        <div class="item" :class="activeSidebar === recycleId ? 'active' : ''" @click="showItemList(recycleId, 'note')">
+            <svg class="icon" aria-hidden="true">
+                <use xlink:href="#clipnote-icon-recycle"></use>
+            </svg>
+            <span class="title">回收站</span>
+        </div>
+        <div class="item" :class="activeSidebar === favouritesId ? 'active' : ''" @click="showItemList(favouritesId, 'note')">
             <svg class="icon" aria-hidden="true">
                 <use xlink:href="#clipnote-icon-favourite"></use>
             </svg>
             <span class="title">收藏夹</span>
         </div>
-        <div class="item clipboard">
+        <div class="item" :class="activeSidebar === clipboardId ? 'active' : ''" @click="showItemList(clipboardId, 'note')">
             <svg class="icon" aria-hidden="true">
                 <use xlink:href="#clipnote-icon-clipboard"></use>
             </svg>
@@ -32,9 +38,15 @@
                               tag="ul">
                 <li v-for="(o, index) in categoryList"
                     :key="index"
-                    @click="showItemList(o._id, 'note')"
                     :class="o._id === activeSidebar ? 'active' : ''">
-                    {{o.name}}
+                    <span class="name" @click="showItemList(o._id, 'note')">{{o.name}}</span>
+                    <span class="btn-delete"
+                          @click="deleteCategory(o._id)"
+                          v-if="o._id !== defaultCategoryId">
+                        <svg class="icon" aria-hidden="true">
+                            <use xlink:href="#clipnote-icon-delete1"></use>
+                        </svg>
+                    </span>
                 </li>
             </transition-group>
         </div>
@@ -47,6 +59,10 @@
         },
         data() {
             return {
+                defaultCategoryId: '0000000000_default_category',
+                recycleId: 'recycle',
+                favouritesId: 'favourites',
+                clipboardId: 'clipboard',
                 activeSidebar: '',
                 categoryList: []
             }
@@ -62,6 +78,8 @@
         },
         mounted() {
             let _this = this
+            // 初始化默认分类
+            _this.initDefaultCategory()
             _this.loadCategoryList((categoryList) => {
                 // 默认打开第一个分类下列表
                 if (categoryList[0]) {
@@ -72,6 +90,35 @@
             _this.activeSidebar = _this.$route.query.categoryId
         },
         methods: {
+            initDefaultCategory() {
+                let _this = this
+                let defaultCategory = {
+                    type: 'category',
+                    _id: _this.defaultCategoryId
+                }
+                _this.$db.find(defaultCategory, (err, docs) => {
+                    if (err) {
+                        _this.$message({
+                            type: 'error',
+                            message: '默认分类初始化失败(查询)：' + err
+                        })
+                    } else {
+                        if (!docs || docs.length === 0) {
+                            defaultCategory.name = '默认分类'
+                            _this.$db.insert(defaultCategory, (err, newDoc) => {
+                                if (err) {
+                                    _this.$message({
+                                        type: 'error',
+                                        message: '默认分类初始化失败：' + err
+                                    })
+                                } else {
+                                    _this.loadCategoryList()
+                                }
+                            })
+                        }
+                    }
+                })
+            },
             loadCategoryList(callback) {
                 let _this = this
                 _this.$db.find({
@@ -108,6 +155,8 @@
                             })
                         } else {
                             _this.loadCategoryList()
+                            // 新增分类成功跳转到当前分类列表
+                            _this.$router.push({name: 'list', query: {categoryId: newDoc._id, type: 'note'}})
                             // _this.$message({
                             //     type: 'success',
                             //     message: '添加成功'
@@ -119,6 +168,58 @@
             },
             showItemList(_id, type) {
                 this.$router.push({name: 'list', query: {categoryId: _id, type: type}})
+            },
+            deleteCategory(id) {
+                let _this = this
+                _this.$confirm('删除分类后，此分类下笔记将转移到回收站，确定删除此分类吗？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    _this.$db.remove({_id: id}, {}, (err, numRemoved) => {
+                        if (err) {
+                            _this.$message({
+                                type: 'error',
+                                message: '删除分类失败：' + err
+                            })
+                        } else {
+                            _this.loadCategoryList((categoryList) => {
+                                // 转移当前分类下内容到回收站
+                                _this.$db.find({
+                                    categoryId: id,
+                                    type: 'note'
+                                }, (err, docs) => {
+                                    if (err) {
+                                        _this.$message({
+                                            type: 'error',
+                                            message: '转移分类下笔记失败(查询)：' + err
+                                        })
+                                    } else {
+                                        docs.forEach((o, index) => {
+                                            let oTemp = JSON.parse(JSON.stringify(o))
+                                            o.categoryId = _this.recycleId
+                                            _this.$db.update(oTemp, o, {}, (err, numReplaced) => {
+                                                if (err) {
+                                                    _this.$message({
+                                                        type: 'error',
+                                                        message: '转移分类下笔记失败：' + err
+                                                    })
+                                                }
+                                            })
+                                        })
+                                        // 删除分类完成回到默认分类下
+                                        _this.$router.push({name: 'list', query: {categoryId: _this.defaultCategoryId, type: 'note'}})
+                                    }
+                                })
+                            })
+                            // _this.$message({
+                            //     type: 'success',
+                            //     message: '删除成功'
+                            // })
+                        }
+                    })
+                }).catch(() => {
+                })
             }
         }
     }
@@ -155,7 +256,6 @@
     }
 
     .sidebar .category ul li {
-        cursor: pointer;
         line-height: 24px;
         font-size: 14px;
         padding-left: 10px;
@@ -165,4 +265,16 @@
         padding-left: 20px;
     }
 
+    .sidebar .name {
+        display: inline-block;
+        width: 70%;
+        cursor: pointer;
+    }
+
+    .sidebar .btn-delete {
+        display: inline-block;
+        float: right;
+        margin-right: 10px;
+        cursor: pointer;
+    }
 </style>
