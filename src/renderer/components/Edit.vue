@@ -5,7 +5,9 @@
                 <el-input size="mini" v-model="note.title" autofocus></el-input>
             </el-form-item>
             <el-form-item>
-                <el-input type="textarea" v-model="note.context"></el-input>
+                <el-input type="textarea"
+                          v-model="note.context"
+                          rows="12"></el-input>
             </el-form-item>
             <el-form-item>
                 <el-button type="success" @click="editNote" size="mini">保存</el-button>

@@ -11,7 +11,7 @@
                         <i class="element-icons clipnote-icon-favourite"
                            :style="item.favourite ? 'color: yellow' : 'color: grey'"></i>
                     </span>
-                    <span class="btn-del" @click="deleteNote(item._id)">
+                    <span class="btn-del" @click="deleteNote(item)">
                         <svg class="icon" aria-hidden="true">
                             <use xlink:href="#clipnote-icon-delete"></use>
                         </svg>
@@ -34,6 +34,7 @@
     export default {
         data() {
             return {
+                recycleId: 'recycle',
                 categoryId: this.$route.query.categoryId,
                 type: this.$route.query.type,
                 itemList: []
@@ -76,14 +77,16 @@
             editNote(id) {
                 this.$router.push({name: 'edit', query: {id: id, categoryId: this.categoryId}})
             },
-            deleteNote(id) {
+            deleteNote(note) {
                 let _this = this
-                _this.$confirm('确定删除此笔记吗？', '提示', {
+                let recycle = note.categoryId === _this.recycleId
+                let info = (recycle ? '删除后将无法恢复，' : '') + '确定删除此笔记吗？'
+                _this.$confirm(info, '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    _this.$db.remove({_id: id}, {}, (err, numRemoved) => {
+                    _this.$db.remove({_id: note._id}, {}, (err, numRemoved) => {
                         if (err) {
                             _this.$message({
                                 type: 'error',
@@ -91,10 +94,23 @@
                             })
                         } else {
                             _this.loadItemList()
-                            _this.$message({
-                                type: 'success',
-                                message: '删除成功'
+                            if (recycle) {
+                                return
+                            }
+                            // 转移当前分类下内容到回收站
+                            note.categoryId = _this.recycleId
+                            _this.$db.insert(note, (err, newDoc) => {
+                                if (err) {
+                                    _this.$message({
+                                        type: 'error',
+                                        message: '转移分类下笔记失败：' + err
+                                    })
+                                }
                             })
+                            // _this.$message({
+                            //     type: 'success',
+                            //     message: '删除成功'
+                            // })
                         }
                     })
                 }).catch(() => {
