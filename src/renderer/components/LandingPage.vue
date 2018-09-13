@@ -1,5 +1,5 @@
 <template>
-    <el-container>
+    <el-container style="height: 100%">
         <el-aside width="200px">
             <side-bar></side-bar>
         </el-aside>
@@ -31,6 +31,9 @@
             clipboard
                 .on('text-changed', () => {
                     let currentText = clipboard.readText()
+                    if (currentText.replace(/\s+/g, '').replace(/[\r\n]/g, '').length === 0) {
+                        return
+                    }
                     _this.$db.insert({
                         categoryId: 'clipboard',
                         type: 'note',
