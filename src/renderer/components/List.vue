@@ -3,8 +3,8 @@
         <ul v-if="itemList.length > 0">
             <li v-for="(item, index) in itemList"
                 :key="index">
-                <span class="item-title" @click="editNote(item._id)">
-                    {{item.title}}
+                <span class="item-title-group" @click="editNote(item._id)">
+                    <span class="item-title">{{item.title}}</span>
                 </span>
                 <span class="item-btn-group">
                     <span class="btn-favourite" @click="favouriteNote(item)">
@@ -63,16 +63,18 @@
                 } else {
                     searchInfo.categoryId = _this.categoryId
                 }
-                _this.$db.find(searchInfo, (err, docs) => {
-                    if (err) {
-                        _this.$message({
-                            type: 'error',
-                            message: '笔记列表加载失败：' + err
-                        })
-                    } else {
-                        _this.itemList = docs
-                    }
-                })
+                _this.$db.find(searchInfo)
+                    .sort({time: -1})
+                    .exec((err, docs) => {
+                        if (err) {
+                            _this.$message({
+                                type: 'error',
+                                message: '笔记列表加载失败：' + err
+                            })
+                        } else {
+                            _this.itemList = docs
+                        }
+                    })
             },
             editNote(id) {
                 this.$router.push({name: 'edit', query: {id: id, categoryId: this.categoryId}})
@@ -148,15 +150,21 @@
     }
 
     .list li {
+        color: #494949;
+        height: 40px;
         line-height: 40px;
         border-bottom: 1px solid #EFEFEF;
     }
 
-    .list .item-title {
-        padding-left: 10px;
+    .list .item-title-group {
         cursor: pointer;
         display: inline-block;
         width: 70%;
+        float: left;
+    }
+
+    .list .item-title-group .item-title {
+        padding-left: 10px;
     }
 
     .btn-edit {
@@ -172,23 +180,23 @@
 
     .item-btn-group {
         display: inline-block;
-        width: 20%;
-        float: right;
+        width: 30%;
+        text-align: right;
     }
 
     .btn-del {
-        float: left;
         cursor: pointer;
-        margin-left: 24px;
+        margin-left: 8px;
+        margin-right: 16px;
     }
 
     .btn-favourite {
-        float: left;
         cursor: pointer;
-        margin-left: 14px;
+        margin: 0 8px;
     }
 
     .no-data {
+        text-shadow: 2px 2px 1px #565656;
         font-weight: bold;
         font-size: 28px;
         color: #CDCDCD;

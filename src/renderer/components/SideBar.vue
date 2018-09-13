@@ -143,6 +143,20 @@
                     confirmButtonText: '确定',
                     cancelButtonText: '取消'
                 }).then(({ value }) => {
+                    if (!value) {
+                        _this.$message({
+                            type: 'warning',
+                            message: '请输入分类名'
+                        })
+                        return
+                    }
+                    if (value.length > 10) {
+                        _this.$message({
+                            type: 'warning',
+                            message: '分类名长度最大为10'
+                        })
+                        return
+                    }
                     let doc = {
                         type: 'category',
                         name: value
@@ -230,6 +244,7 @@
     .sidebar {
         height: 100vh;
         font-size: 14px;
+        color: #393939;
         border-right: 1px solid #ECECEC;
     }
 
@@ -269,6 +284,7 @@
         display: inline-block;
         width: 70%;
         cursor: pointer;
+        float: left;
     }
 
     .sidebar .btn-delete {

@@ -1,5 +1,5 @@
 <template>
-    <el-container>
+    <el-container style="height: 100%">
         <el-aside width="200px">
             <side-bar></side-bar>
         </el-aside>
@@ -35,7 +35,8 @@
                         categoryId: 'clipboard',
                         type: 'note',
                         context: currentText,
-                        title: currentText.substring(0, 20)
+                        title: currentText.substring(0, 20),
+                        time: new Date().getTime()
                     }, (err, newDoc) => {
                         if (err) {
                             _this.$message({
@@ -68,5 +69,6 @@
     .el-main {
         padding: 24px 14px;
         background-color: #F8F8F8;
+        height: 100%;
     }
 </style>

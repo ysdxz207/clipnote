@@ -2,12 +2,12 @@
     <transition enter-active-class="bounceIn" leave-active-class="zoomOutTop">
         <el-form ref="note" :model="note">
             <el-form-item>
-                <el-input size="mini" v-model="note.title" autofocus></el-input>
+                <el-input size="mini" v-model="note.title" autofocus placeholder="请输入笔记标题"></el-input>
             </el-form-item>
             <el-form-item>
                 <el-input type="textarea"
                           v-model="note.context"
-                          rows="12"></el-input>
+                          rows="12" placeholder="请输入笔记内容"></el-input>
             </el-form-item>
             <el-form-item>
                 <el-button type="success" @click="editNote" size="mini">保存</el-button>
@@ -54,9 +54,15 @@
             },
             editNote() {
                 let _this = this
+                if (!_this.note.title) {
+                    _this.$message({
+                        type: 'warning',
+                        message: '请输入笔记标题'
+                    })
+                    return
+                }
                 if (_this.note._id) {
                     _this.$db.update(_this.noteTemp, _this.note, {}, (err, num) => {
-                        console.log(num)
                         if (err) {
                             _this.$message({
                                 type: 'error',
@@ -72,6 +78,7 @@
                         }
                     })
                 } else {
+                    _this.note.time = new Date().getTime()
                     _this.$db.insert(_this.note, (err, newDoc) => {
                         if (err) {
                             _this.$message({
