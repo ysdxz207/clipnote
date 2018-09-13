@@ -34,7 +34,7 @@
             </el-row>
             <transition-group name="bounce"
                               enter-active-class="bounceInLeft"
-                              leave-active-class="bounceOutRight"
+                              leave-active-class="bounceOutLeft"
                               tag="ul">
                 <li v-for="(o, index) in categoryList"
                     :key="index"
@@ -94,7 +94,8 @@
                 let _this = this
                 let defaultCategory = {
                     type: 'category',
-                    _id: _this.defaultCategoryId
+                    _id: _this.defaultCategoryId,
+                    time: 999999999999999
                 }
                 _this.$db.find(defaultCategory, (err, docs) => {
                     if (err) {
@@ -123,7 +124,9 @@
                 let _this = this
                 _this.$db.find({
                     type: 'category'
-                }, (err, docs) => {
+                }).sort({
+                    time: -1
+                }).exec((err, docs) => {
                     if (err) {
                         _this.$message({
                             type: 'error',
@@ -159,7 +162,8 @@
                     }
                     let doc = {
                         type: 'category',
-                        name: value
+                        name: value,
+                        time: new Date().getTime()
                     }
                     _this.$db.insert(doc, (err, newDoc) => {
                         if (err) {
@@ -245,6 +249,7 @@
         height: 100vh;
         font-size: 14px;
         border-right: 1px solid #ECECEC;
+        overflow-x: hidden;
     }
 
     .sidebar .active {
@@ -270,6 +275,7 @@
     }
 
     .sidebar .category ul li {
+        height: 24px;
         line-height: 24px;
         font-size: 14px;
         padding-left: 10px;
