@@ -21,7 +21,6 @@
 
     * {
         font-size: 14px;
-        font-weight: bold;
         font-family: SourceHanSansCN-Normal,serif;
     }
 
