@@ -22,7 +22,7 @@
     * {
         font-size: 14px;
         font-weight: bold;
-        font-family: MissYuan,serif
+        font-family: SourceHanSansCN-Normal,serif;
     }
 
     .icon {

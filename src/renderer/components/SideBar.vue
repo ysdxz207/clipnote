@@ -244,7 +244,7 @@
     .sidebar {
         height: 100vh;
         font-size: 14px;
-        color: #393939;
+        color: #222222;
         border-right: 1px solid #ECECEC;
     }
 
