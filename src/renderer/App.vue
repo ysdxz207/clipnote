@@ -49,7 +49,7 @@
     ::-webkit-scrollbar-thumb {
         border-radius: 4px;
         -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-        background: rgb(26, 28, 31);
+        background: rgb(229, 158, 226);
         /*background: rgb(255, 132, 115);*/
     }
 

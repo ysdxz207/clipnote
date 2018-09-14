@@ -1,22 +1,27 @@
 <template>
     <div class="sidebar">
-        <div class="item" :class="activeSidebar === recycleId ? 'active' : ''" @click="showItemList(recycleId, 'note')">
-            <svg class="icon" aria-hidden="true">
-                <use xlink:href="#clipnote-icon-recycle"></use>
-            </svg>
-            <span class="title">回收站</span>
-        </div>
-        <div class="item" :class="activeSidebar === favouritesId ? 'active' : ''" @click="showItemList(favouritesId, 'note')">
-            <svg class="icon" aria-hidden="true">
-                <use xlink:href="#clipnote-icon-favourite"></use>
-            </svg>
-            <span class="title">收藏夹</span>
-        </div>
-        <div class="item" :class="activeSidebar === clipboardId ? 'active' : ''" @click="showItemList(clipboardId, 'note')">
-            <svg class="icon" aria-hidden="true">
-                <use xlink:href="#clipnote-icon-clipboard"></use>
-            </svg>
-            <span class="title">剪贴板</span>
+        <div>
+            <div class="item" :class="activeSidebar === recycleId ? 'active' : ''"
+                 @click="showItemList(recycleId, 'note')">
+                <svg class="icon" aria-hidden="true">
+                    <use xlink:href="#clipnote-icon-recycle"></use>
+                </svg>
+                <span class="title">回收站</span>
+            </div>
+            <div class="item" :class="activeSidebar === favouritesId ? 'active' : ''"
+                 @click="showItemList(favouritesId, 'note')">
+                <svg class="icon" aria-hidden="true">
+                    <use xlink:href="#clipnote-icon-favourite"></use>
+                </svg>
+                <span class="title">收藏夹</span>
+            </div>
+            <div class="item" :class="activeSidebar === clipboardId ? 'active' : ''"
+                 @click="showItemList(clipboardId, 'note')">
+                <svg class="icon" aria-hidden="true">
+                    <use xlink:href="#clipnote-icon-clipboard"></use>
+                </svg>
+                <span class="title">剪贴板</span>
+            </div>
         </div>
         <div class="category">
             <el-row class="item">
@@ -55,8 +60,7 @@
 
 <script>
     export default {
-        components: {
-        },
+        components: {},
         data() {
             return {
                 defaultCategoryId: '0000000000_default_category',
@@ -68,7 +72,7 @@
             }
         },
         watch: {
-            '$route' (to, from) {
+            '$route'(to, from) {
                 let categoryId = this.$route.query.categoryId
                 if (categoryId) {
                     this.activeSidebar = categoryId
@@ -145,7 +149,7 @@
                 _this.$prompt('请输入分类名', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消'
-                }).then(({ value }) => {
+                }).then(({value}) => {
                     if (!value) {
                         _this.$message({
                             type: 'warning',
@@ -226,7 +230,10 @@
                                             })
                                         })
                                         // 删除分类完成回到默认分类下
-                                        _this.$router.push({name: 'list', query: {categoryId: _this.defaultCategoryId, type: 'note'}})
+                                        _this.$router.push({
+                                            name: 'list',
+                                            query: {categoryId: _this.defaultCategoryId, type: 'note'}
+                                        })
                                     }
                                 })
                             })
@@ -249,7 +256,12 @@
         height: 100vh;
         font-size: 14px;
         border-right: 1px solid #ECECEC;
-        overflow-x: hidden;
+
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        flex-wrap: nowrap;
+        justify-content: stretch;
     }
 
     .sidebar .active {
@@ -263,15 +275,22 @@
         cursor: pointer;
     }
 
-
     .sidebar .category {
         line-height: 34px;
+
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        flex-wrap: nowrap;
+        justify-content: stretch;
     }
 
     .sidebar .category ul {
         list-style: none;
         margin: 0;
         padding: 0;
+        overflow-y: scroll;
+        overflow-x: hidden;
     }
 
     .sidebar .category ul li {
