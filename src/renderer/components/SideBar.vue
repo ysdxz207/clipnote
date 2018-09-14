@@ -20,7 +20,13 @@
                 <svg class="icon" aria-hidden="true">
                     <use xlink:href="#clipnote-icon-clipboard"></use>
                 </svg>
-                <span class="title">剪贴板</span>
+                <span class="title">剪贴板
+                <el-switch
+                                    v-model="value2"
+                                    active-color="#13ce66"
+                                    inactive-color="#ff4949">
+                </el-switch>
+                </span>
             </div>
         </div>
         <div class="category">

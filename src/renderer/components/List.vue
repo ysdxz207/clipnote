@@ -196,7 +196,6 @@
     }
 
     .no-data {
-        text-shadow: 2px 2px 1px #565656;
         font-weight: bold;
         font-size: 28px;
         color: #CDCDCD;
