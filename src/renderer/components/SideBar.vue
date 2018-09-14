@@ -46,9 +46,7 @@
                     </svg>
                 </el-col>
             </el-row>
-            <transition-group name="bounce"
-                              enter-active-class="bounceInLeft"
-                              leave-active-class="bounceOutLeft"
+            <transition-group enter-active-class="bounceInLeft"
                               tag="ul">
                 <li v-for="(o, index) in categoryList"
                     :key="index"
@@ -131,7 +129,12 @@
                                         message: '默认分类初始化失败：' + err
                                     })
                                 } else {
-                                    _this.loadCategoryList()
+                                    _this.loadCategoryList((categoryList) => {
+                                        // 默认打开第一个分类下列表
+                                        if (categoryList[0]) {
+                                            _this.showItemList(categoryList[0]._id, 'note')
+                                        }
+                                    })
                                 }
                             })
                         }

@@ -7,8 +7,8 @@ import App from './App'
 import router from './router'
 import store from './store'
 import db from './db'
-import './assets/icons/iconfont.css'
-import './assets/icons/iconfont.js'
+import '../../static/assets/icons/iconfont.css'
+import '../../static/assets/icons/iconfont.js'
 const clipboard = require('electron-clipboard-extended')
 
 Vue.use(ElementUI)

@@ -3,6 +3,12 @@ import db from '../db'
 
 const config = {}
 
+config.default = {
+    type: 'config',
+    startup: true,
+    clipboardCollection: true
+}
+
 config.read = function (callback) {
     db.findOne({
         type: 'config'
@@ -15,7 +21,7 @@ config.read = function (callback) {
             console.error(err)
         } else {
             if (callback) {
-                callback(doc || {})
+                callback(doc || config.default)
             }
         }
     })
@@ -43,12 +49,7 @@ config.save = function (conf, callback) {
             })
         } else {
             // 初始化
-            conf = {
-                type: 'config',
-                startup: true,
-                clipboardCollection: true
-            }
-            db.insert(conf, (err, newDoc) => {
+            db.insert(config.default, (err, newDoc) => {
                 if (err) {
                     // Message({
                     //     type: 'error',

@@ -1,6 +1,7 @@
 'use strict'
 
 import Config from '../renderer/utils/Config'
+
 const electron = require('electron')
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
@@ -10,7 +11,7 @@ const AutoLaunch = require('auto-launch')
 const path = require('path')
 const Menu = electron.Menu
 
-const ICON_PATH = path.join(__dirname, '../renderer/assets/icons/app/icon.ico')
+const ICON_PATH = path.join(__static, 'assets/icons/app/icon.ico')
 
 /**
  * Set `__static` path to static files in production
@@ -31,7 +32,7 @@ var clipnoteAutoLauncher = new AutoLaunch({
     path: process.cwd() + path.sep + app.getName() + '.exe'
 })
 
-function createWindow () {
+function createWindow() {
     /**
      * Initial window options
      */
@@ -75,15 +76,24 @@ function registShortCut() {
 function registTray() {
     // 读取配置
     Config.read((conf) => {
-        console.log(global)
         tray = new Tray(ICON_PATH)
         const contextMenu = Menu.buildFromTemplate([
-            {label: '关于',
+            {
+                label: '关于',
                 type: 'normal',
                 click() {
-                    require('electron').shell.openExternal('https://github.com/ysdxz207/equickrun.git')
-                }},
-            {label: '开机启动',
+                    require('electron').shell.openExternal('https://github.com/ysdxz207/clipnote.git')
+                }
+            },
+            {
+                label: '设置',
+                type: 'normal',
+                click() {
+                    settings()
+                }
+            },
+            {
+                label: '开机启动',
                 type: 'checkbox',
                 checked: conf['startup'],
                 click(menuItem) {
@@ -92,12 +102,15 @@ function registTray() {
                         // 处理开机启动项
                         toggleStartUp(menuItem.checked)
                     })
-                }},
-            {label: '退出',
+                }
+            },
+            {
+                label: '退出',
                 type: 'normal',
                 click() {
                     app.quit()
-                }}
+                }
+            }
         ])
         tray.setToolTip('equickrun')
         tray.setContextMenu(contextMenu)
@@ -119,6 +132,10 @@ function toggleStartUp(startup) {
     } else {
         clipnoteAutoLauncher.disable()
     }
+}
+
+function settings() {
+    console.log()
 }
 
 app.on('ready', createWindow)

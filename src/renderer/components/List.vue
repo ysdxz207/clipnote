@@ -26,7 +26,8 @@
                    type="success"
                    icon="el-icon-edit"
                    circle
-                   @click.native="editNote()"></el-button>
+                   @click.native="editNote()"
+                   title="写笔记"></el-button>
     </div>
 </template>
 

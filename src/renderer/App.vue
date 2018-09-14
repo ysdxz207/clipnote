@@ -11,7 +11,7 @@
 </script>
 
 <style lang="scss">
-    @import "./assets/fonts/font.css";
+    @import "../../static/assets/fonts/font.css";
     $animationDuration: 0.5s;
     @import "~vue2-animate/src/sass/vue2-animate.scss";
 

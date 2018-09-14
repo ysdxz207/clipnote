@@ -2,8 +2,8 @@
   "name": "clipnote",
   "version": "0.0.1",
   "author": "Moses <ysdxz207@qq.com>",
-  "description": "An electron-vue project",
-  "license": null,
+  "description": "A desktop note and clipboard manager program cook with electron-vue.",
+  "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {
     "build": "node .electron-vue/build.js && electron-builder",
