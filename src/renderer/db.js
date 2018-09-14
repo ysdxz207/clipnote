@@ -1,8 +1,8 @@
 import Datastore from 'nedb'
 import path from 'path'
-import {remote} from 'electron'
+import {app, remote} from 'electron'
 
-const userDataPath = remote.app.getPath('home')
+const userDataPath = (app || remote.app).getPath('home')
 const DB_DIR = path.join(userDataPath, 'clipnote')
 const DB_PATH = path.join(DB_DIR, 'clipnote.nedb')
 

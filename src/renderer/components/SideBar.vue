@@ -15,18 +15,21 @@
                 </svg>
                 <span class="title">收藏夹</span>
             </div>
-            <div class="item" :class="activeSidebar === clipboardId ? 'active' : ''"
-                 @click="showItemList(clipboardId, 'note')">
-                <svg class="icon" aria-hidden="true">
-                    <use xlink:href="#clipnote-icon-clipboard"></use>
-                </svg>
-                <span class="title">剪贴板
-                <el-switch
-                                    v-model="value2"
-                                    active-color="#13ce66"
-                                    inactive-color="#ff4949">
-                </el-switch>
-                </span>
+            <div class="item" :class="activeSidebar === clipboardId ? 'active' : ''">
+                <el-col :span="12" @click.native="showItemList(clipboardId, 'note')">
+                    <svg class="icon" aria-hidden="true">
+                        <use xlink:href="#clipnote-icon-clipboard"></use>
+                    </svg>
+                    <span class="title">剪贴板</span>
+                </el-col>
+                <el-col :span="2" :push="4">
+                    <el-switch
+                            title="收集剪贴板开关"
+                            v-model="conf.clipboardCollection"
+                            active-color="#13ce66"
+                            inactive-color="#ff4949">
+                    </el-switch>
+                </el-col>
             </div>
         </div>
         <div class="category">
@@ -65,6 +68,8 @@
 </template>
 
 <script>
+    import Config from '../utils/Config'
+
     export default {
         components: {},
         data() {
@@ -74,7 +79,8 @@
                 favouritesId: 'favourites',
                 clipboardId: 'clipboard',
                 activeSidebar: '',
-                categoryList: []
+                categoryList: [],
+                conf: {}
             }
         },
         watch: {
@@ -98,6 +104,8 @@
             })
             // 选中第一个分类
             _this.activeSidebar = _this.$route.query.categoryId
+            // 是否开启剪贴板收集功能
+            _this.loadClipboardCollection()
         },
         methods: {
             initDefaultCategory() {
@@ -251,6 +259,20 @@
                     })
                 }).catch(() => {
                 })
+            },
+            loadClipboardCollection() {
+                let _this = this
+                Config.read((config) => {
+                    _this.conf = config
+                    _this.$watch('conf', {
+                        deep: true,
+                        handler: function () {
+                            Config.save(_this.conf, () => {
+                                _this.bus.$emit('configChange')
+                            })
+                        }
+                    })
+                })
             }
         }
     }
@@ -275,6 +297,7 @@
     }
 
     .sidebar .item {
+        height: 28px;
         line-height: 28px;
         border-bottom: 1px solid #DDD;
         padding-left: 16px;
@@ -295,7 +318,7 @@
         list-style: none;
         margin: 0;
         padding: 0;
-        overflow-y: scroll;
+        overflow-y: auto;
         overflow-x: hidden;
     }
 
