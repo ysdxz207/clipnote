@@ -90,6 +90,8 @@
             }
 
         },
+        create() {
+        },
         mounted() {
             let _this = this
             // 初始化默认分类
@@ -103,7 +105,7 @@
             // 选中第一个分类
             _this.activeSidebar = _this.$route.query.categoryId
             // 是否开启剪贴板收集功能
-            _this.loadClipboardCollection()
+            setTimeout(_this.loadClipboardCollection(), 2000)
         },
         methods: {
             initDefaultCategory() {
@@ -267,11 +269,12 @@
                 let _this = this
                 Config.read((config) => {
                     _this.conf = config
-                    _this.$watch('conf', {
+                    _this.$watch('conf.clipboardCollection', {
                         deep: true,
                         handler: function () {
+                            console.log('change clipboardCollection')
                             Config.save(_this.conf, () => {
-                                _this.bus.$emit('configChange')
+                                _this.bus.$emit('configChange', 'clipboardCollection')
                             })
                         }
                     })

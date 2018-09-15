@@ -4,6 +4,7 @@ import Router from 'vue-router'
 import Index from '@/components/LandingPage'
 import List from '@/components/List'
 import Edit from '@/components/Edit'
+import Setting from '@/components/Setting'
 
 Vue.use(Router)
 
@@ -31,8 +32,9 @@ export default new Router({
             ]
         },
         {
-            path: '*',
-            redirect: '/'
+            path: '/setting',
+            name: 'setting',
+            component: Setting
         }
     ]
 })

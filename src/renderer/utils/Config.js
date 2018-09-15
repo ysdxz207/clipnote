@@ -6,13 +6,20 @@ const config = {}
 config.default = {
     type: 'config',
     startup: true,
-    clipboardCollection: true
+    clipboardCollection: true,
+    hotkey: {
+        toggleMain: {
+            control: ['CmdOrCtrl'],
+            key: '`'
+        }
+    }
 }
 
 config.read = function (callback) {
     db.findOne({
         type: 'config'
     }, (err, doc) => {
+        console.log('read', doc)
         if (err) {
             // Message({
             //     type: 'error',
@@ -21,7 +28,7 @@ config.read = function (callback) {
             console.error(err)
         } else {
             if (callback) {
-                callback(doc || config.default)
+                callback(doc || {})
             }
         }
     })
@@ -34,6 +41,7 @@ config.save = function (conf, callback) {
                 return
             }
             // 更新
+            console.log('更新', obj, conf, JSON.stringify(obj))
             db.update(obj, conf, {}, (err, numReplaced) => {
                 if (err) {
                     // Message({
@@ -42,6 +50,7 @@ config.save = function (conf, callback) {
                     // })
                     console.error(err)
                 } else {
+                    console.log('num', numReplaced)
                     if (callback) {
                         callback()
                     }

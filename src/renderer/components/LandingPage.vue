@@ -18,6 +18,8 @@
     import HeaderBar from './HeaderBar'
     import SideBar from './SideBar'
     import Config from '../utils/Config'
+    import Shortcut from '../utils/Shortcut'
+    import electron from 'electron'
 
     export default {
         name: 'landing-page',
@@ -27,17 +29,22 @@
         },
         created() {
             let _this = this
-            _this.bus.$on('configChange', function () {
-                // 读取配置监听收集剪贴板
-                _this.startWatchingCollectionClipboard()
+            _this.bus.$on('configChange', function (type) {
+                if (type === 'clipboardCollection') {
+                    // 读取配置监听收集剪贴板
+                    _this.startWatchingCollectionClipboard()
+                }
             })
         },
         mounted() {
             let _this = this
             // 初始化配置
-            Config.save()
-            // 读取配置监听收集剪贴板
-            _this.startWatchingCollectionClipboard()
+            Config.save(undefined, () => {
+                // 读取配置监听收集剪贴板
+                _this.startWatchingCollectionClipboard()
+                // 注册快捷键
+                Shortcut.registShortCut(electron.remote.getCurrentWindow(), 'toggleMain')
+            })
         },
         methods: {
             open(link) {
@@ -46,10 +53,10 @@
             startWatchingCollectionClipboard() {
                 let _this = this
                 Config.read((config) => {
+                    _this.clipboard.off('text-changed')
+                    _this.clipboard.off('image-changed')
+                    _this.clipboard.stopWatching()
                     if (!config.clipboardCollection) {
-                        _this.clipboard.off('text-changed')
-                        _this.clipboard.off('image-changed')
-                        _this.clipboard.stopWatching()
                         return
                     }
                     _this.clipboard

@@ -6,7 +6,6 @@ const electron = require('electron')
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const Tray = electron.Tray
-const globalShortcut = electron.globalShortcut
 const AutoLaunch = require('auto-launch')
 const path = require('path')
 const Menu = electron.Menu
@@ -49,28 +48,7 @@ function createWindow() {
         mainWindow = null
     })
 
-    registShortCut()
     registTray()
-}
-
-function registShortCut() {
-    // 注册一个 'CommandOrControl+`' 的全局快捷键
-    const ret = globalShortcut.register('CommandOrControl+`', () => {
-        if (mainWindow.isVisible()) {
-            mainWindow.hide()
-        } else {
-            mainWindow.show()
-        }
-    })
-
-    if (!ret) {
-        console.log('Shortcut registration failed!')
-    }
-
-    // 检查快捷键是否注册成功
-    if (globalShortcut.isRegistered('CommandOrControl+`')) {
-        console.log('Shortcut registration sucess!')
-    }
 }
 
 function registTray() {
@@ -135,7 +113,18 @@ function toggleStartUp(startup) {
 }
 
 function settings() {
-    console.log()
+    let child = new BrowserWindow({
+        width: 600,
+        height: 400,
+        parent: mainWindow,
+        modal: true,
+        show: false,
+        resizable: false
+    })
+    child.loadURL(winURL + '/#/setting')
+    child.once('ready-to-show', () => {
+        child.show()
+    })
 }
 
 app.on('ready', createWindow)
