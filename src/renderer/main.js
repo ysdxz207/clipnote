@@ -9,13 +9,11 @@ import store from './store'
 import db from './db'
 import '../../static/assets/icons/iconfont.css'
 import '../../static/assets/icons/iconfont.js'
-const clipboard = require('electron-clipboard-extended')
 
 Vue.use(ElementUI)
 
 Vue.prototype.bus = new Vue()
 Vue.prototype.$db = db
-Vue.prototype.clipboard = clipboard
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios

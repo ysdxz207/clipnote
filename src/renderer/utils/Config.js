@@ -5,7 +5,7 @@ const config = {}
 
 config.default = {
     type: 'config',
-    startup: true,
+    startup: false,
     clipboardCollection: true,
     hotkey: {
         toggleMain: {

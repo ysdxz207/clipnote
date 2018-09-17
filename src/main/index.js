@@ -1,6 +1,8 @@
 'use strict'
 
 import Config from '../renderer/utils/Config'
+import Shortcut from '../renderer/utils/Shortcut'
+import Clipboard from '../renderer/utils/Clipboard'
 
 const electron = require('electron')
 const app = electron.app
@@ -126,6 +128,14 @@ function settings() {
         child.show()
     })
 }
+
+// 初始化配置
+Config.save(undefined, () => {
+    // 读取配置监听收集剪贴板
+    Clipboard.watchOrUnWatch()
+    // 注册快捷键
+    Shortcut.registShortCut(mainWindow, 'toggleMain')
+})
 
 app.on('ready', createWindow)
 
