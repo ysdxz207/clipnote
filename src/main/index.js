@@ -40,20 +40,24 @@ function createWindow() {
         height: 563,
         useContentSize: true,
         width: 1000,
-        resizable: false
+        resizable: false,
+        show: false
     })
 
     mainWindow.loadURL(winURL)
 
-    mainWindow.on('closed', () => {
-        mainWindow = null
-    })
     // 初始化配置
     Config.save(undefined, () => {
         // 注册快捷键
         Shortcut.registShortCut(mainWindow, 'toggleMain')
     })
     registTray()
+    mainWindow.on('close', (e) => {
+        e.preventDefault()
+        if (mainWindow.isVisible()) {
+            mainWindow.hide()
+        }
+    })
 }
 
 function registTray() {
@@ -95,7 +99,7 @@ function registTray() {
                 }
             }
         ])
-        tray.setToolTip('equickrun')
+        tray.setToolTip('点击显示/隐藏主窗体')
         tray.setContextMenu(contextMenu)
 
         tray.on('click', function (e) {
