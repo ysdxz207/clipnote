@@ -10,6 +10,7 @@ const Tray = electron.Tray
 const AutoLaunch = require('auto-launch')
 const path = require('path')
 const Menu = electron.Menu
+const ipcMain = electron.ipcMain
 
 const ICON_PATH = path.join(__static, 'assets/icons/app/icon.ico')
 
@@ -37,27 +38,25 @@ function createWindow() {
      * Initial window options
      */
     mainWindow = new BrowserWindow({
+        width: 1000,
         height: 563,
         useContentSize: true,
-        width: 1000,
         resizable: false,
-        show: false
+        show: false,
+        closable: false
     })
 
     mainWindow.loadURL(winURL)
 
+    mainWindow.on('close', (e) => {
+        mainWindow = null
+    })
     // 初始化配置
     Config.save(undefined, () => {
         // 注册快捷键
         Shortcut.registShortCut(mainWindow, 'toggleMain')
     })
     registTray()
-    mainWindow.on('close', (e) => {
-        e.preventDefault()
-        if (mainWindow.isVisible()) {
-            mainWindow.hide()
-        }
-    })
 }
 
 function registTray() {
@@ -66,7 +65,7 @@ function registTray() {
         tray = new Tray(ICON_PATH)
         const contextMenu = Menu.buildFromTemplate([
             {
-                label: '关于',
+                label: '源码',
                 type: 'normal',
                 click() {
                     require('electron').shell.openExternal('https://github.com/ysdxz207/clipnote.git')
