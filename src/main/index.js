@@ -2,7 +2,6 @@
 
 import Config from '../renderer/utils/Config'
 import Shortcut from '../renderer/utils/Shortcut'
-import Clipboard from '../renderer/utils/Clipboard'
 
 const electron = require('electron')
 const app = electron.app
