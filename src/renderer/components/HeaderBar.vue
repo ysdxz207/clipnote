@@ -1,7 +1,7 @@
 <template>
     <div class="header">
         <el-col :span="14">
-            Clipnote
+            <span class="title">Clipnote</span>
         </el-col>
         <el-col :span="10">
             <el-col :span="4">
@@ -11,7 +11,10 @@
             </el-col>
             <el-col :span="20">
                 <label>
-                    <input type="text" placeholder="搜索" class="input-search"/>
+                    <input type="text"
+                           v-model="keywords"
+                           placeholder="搜索"
+                           class="input-search" @keyup="search"/>
                 </label>
             </el-col>
         </el-col>
@@ -20,7 +23,16 @@
 
 <script>
     export default {
+        data() {
+            return {
+                keywords: ''
+            }
+        },
         methods: {
+            search() {
+                this.$router.push({name: 'list', query: {categoryId: '0000000000_default_category', type: 'note'}})
+                this.bus.$emit('search', this.keywords)
+            }
         }
     }
 </script>
@@ -34,6 +46,10 @@
         background-color: #232323;
         height: 100%;
         box-shadow: 0 4px 10px rgba(0,0,0,.45);
+    }
+
+    .header .title {
+        padding-left: 10px;
     }
 
     .header .input-search {

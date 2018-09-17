@@ -6,6 +6,7 @@ const clipboard = require('electron-clipboard-extended')
 const clip = {}
 
 clip.watchOrUnWatch = function (callback) {
+    console.log('start watch')
     Config.read((config) => {
         clipboard.off('text-changed')
         clipboard.off('image-changed')

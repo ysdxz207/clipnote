@@ -27,7 +27,8 @@
                    icon="el-icon-edit"
                    circle
                    @click.native="editNote()"
-                   title="写笔记"></el-button>
+                   title="写笔记"
+                   v-if="$route.query.categoryId !== '0000000000_default_category'"></el-button>
     </div>
 </template>
 
@@ -49,11 +50,53 @@
             }
 
         },
+        created() {
+            let _this = this
+            _this.bus.$on('search', function (keywords) {
+                _this.triggerSearch(keywords)
+            })
+        },
         mounted() {
             let _this = this
             _this.loadItemList()
         },
         methods: {
+            triggerSearch(keywords) {
+                let _this = this
+                let keywordArr = keywords.split(' ')
+                let regStr = ''
+                keywordArr.forEach((o, index) => {
+                    o = o.replace(/\\/g, '\\\\')
+                        .replace(/\//g, '\\/')
+                        .replace(/\|/g, '\\|')
+                        .replace(/\{/g, '\\{')
+                        .replace(/\}/g, '\\}')
+                        .replace(/\(/g, '\\(')
+                        .replace(/\)/g, '\\)')
+                        .replace(/\[/g, '\\[')
+                        .replace(/\]/g, '\\]')
+                        .replace(/\^/g, '\\^')
+                        .replace(/\$/g, '\\$')
+                        .replace(/\+/g, '\\+')
+                        .replace(/\?/g, '\\?')
+                        .replace(/\./g, '\\.')
+                        .replace(/\*/g, '\\*')
+                    regStr += '(' + o + ')([\\s\\S]*)'
+                })
+                let reg = new RegExp(regStr)
+                _this.$db.find({
+                    type: 'note',
+                    title: {
+                        $regex: reg
+                    }
+                })
+                    .sort({time: -1})
+                    .exec((err, docs) => {
+                        if (!err) {
+                            _this.itemList = docs
+                        }
+                    })
+            },
             loadItemList() {
                 let _this = this
                 let searchInfo = {
@@ -61,6 +104,7 @@
                 }
                 if (_this.categoryId === 'favourites') {
                     searchInfo.favourite = true
+                } else if (_this.categoryId === '0000000000_default_category') {
                 } else {
                     searchInfo.categoryId = _this.categoryId
                 }

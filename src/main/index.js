@@ -49,7 +49,11 @@ function createWindow() {
     mainWindow.on('closed', () => {
         mainWindow = null
     })
-
+    // 初始化配置
+    Config.save(undefined, () => {
+        // 注册快捷键
+        Shortcut.registShortCut(mainWindow, 'toggleMain')
+    })
     registTray()
 }
 
@@ -128,14 +132,6 @@ function settings() {
         child.show()
     })
 }
-
-// 初始化配置
-Config.save(undefined, () => {
-    // 读取配置监听收集剪贴板
-    Clipboard.watchOrUnWatch()
-    // 注册快捷键
-    Shortcut.registShortCut(mainWindow, 'toggleMain')
-})
 
 app.on('ready', createWindow)
 

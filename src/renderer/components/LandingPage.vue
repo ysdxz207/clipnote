@@ -35,6 +35,8 @@
             })
         },
         mounted() {
+            // 读取配置监听收集剪贴板
+            Clipboard.watchOrUnWatch()
         },
         methods: {
             open(link) {

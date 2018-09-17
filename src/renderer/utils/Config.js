@@ -26,10 +26,9 @@ config.read = function (callback) {
             //     message: '读取配置信息失败：' + err
             // })
             console.error(err)
-        } else {
-            if (callback) {
-                callback(doc || {})
-            }
+        }
+        if (callback) {
+            callback(doc || {})
         }
     })
 }
@@ -38,6 +37,9 @@ config.save = function (conf, callback) {
     config.read((obj) => {
         if (JSON.stringify(obj) !== '{}') {
             if (!conf || JSON.stringify(obj) === '{}') {
+                if (callback) {
+                    callback()
+                }
                 return
             }
             // 更新
