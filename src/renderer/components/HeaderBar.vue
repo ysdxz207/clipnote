@@ -4,7 +4,7 @@
             <span class="title">Clipnote</span>
         </el-col>
         <el-col :span="10">
-            <el-col :span="4">
+            <el-col :span="4" style="text-align: right">
                 <svg class="icon" aria-hidden="true">
                     <use xlink:href="#clipnote-icon-search"></use>
                 </svg>
@@ -41,23 +41,25 @@
     .header {
         position: relative;
         z-index: 1;
-        color: #DCDCDC;
+        color: #232323;
         line-height: 40px;
-        background-color: #232323;
+        background-color: #F8F8F8;
         height: 100%;
-        box-shadow: 0 4px 10px rgba(0,0,0,.45);
+        box-shadow: 0 1px 4px rgba(0,0,0,.25);
     }
 
     .header .title {
         padding-left: 10px;
+        font-weight: bold;
+        font-size: 20px;
     }
 
     .header .input-search {
-        background-color: #232323;
+        background-color: #F8F8F8;
         border: none;
-        border-bottom: 1px solid #323232;
+        border-bottom: 1px solid #DDDDDD;
         box-shadow: none;
-        color: #FFFFFF;
+        color: #232323;
         width: 100%;
     }
 

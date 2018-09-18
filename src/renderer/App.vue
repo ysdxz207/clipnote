@@ -58,7 +58,7 @@
         line-height: 30px;
         width:100%;
         cursor: move;
-        background-color: #fff0fe;
+        background-color: #222222;
         opacity: 0.78;
         -webkit-app-region: drag;
         display: flex;

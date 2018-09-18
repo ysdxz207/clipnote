@@ -83,7 +83,7 @@
                         .replace(/\*/g, '\\*')
                     regStr += '(' + o + ')([\\s\\S]*)'
                 })
-                let reg = new RegExp(regStr)
+                let reg = new RegExp(regStr, 'i')
                 _this.$db.find({
                     type: 'note',
                     title: {
