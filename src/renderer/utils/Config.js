@@ -11,6 +11,10 @@ config.default = {
         toggleMain: {
             control: ['CmdOrCtrl'],
             key: '`'
+        },
+        toggleQuickrun: {
+            control: ['CmdOrCtrl', 'Shift'],
+            key: '`'
         }
     }
 }

@@ -1,7 +1,7 @@
 <template>
     <div id="app">
-        <header class="frame-header-bar" @click="hideWindow">
-            <i class="el-icon-arrow-down btn-close"></i>
+        <header class="frame-header-bar">
+            <i class="el-icon-arrow-down btn-close" @click="hideWindow"></i>
         </header>
         <router-view></router-view>
     </div>
@@ -15,7 +15,7 @@
         },
         methods: {
             hideWindow() {
-                electron.ipcRenderer.send('hideWindow')
+                electron.remote.getCurrentWindow().hide()
             }
         }
     }
@@ -57,7 +57,6 @@
         height: 30px;
         line-height: 30px;
         width:100%;
-        cursor: move;
         background-color: #222222;
         opacity: 0.78;
         -webkit-app-region: drag;

@@ -10,7 +10,6 @@ const Tray = electron.Tray
 const AutoLaunch = require('auto-launch')
 const path = require('path')
 const Menu = electron.Menu
-const ipcMain = electron.ipcMain
 
 const ICON_PATH = path.join(__static, 'assets/icons/app/icon.ico')
 
@@ -22,7 +21,7 @@ if (process.env.NODE_ENV !== 'development') {
     global.__static = path.join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-let mainWindow, tray
+let mainWindow, quickrunWindow, tray
 const winURL = process.env.NODE_ENV === 'development'
     ? `http://localhost:9080`
     : `file://${__dirname}/index.html`
@@ -38,6 +37,7 @@ function createWindow() {
      * Initial window options
      */
     mainWindow = new BrowserWindow({
+        id: 1,
         width: 1000,
         height: 563,
         frame: false,
@@ -52,11 +52,29 @@ function createWindow() {
     mainWindow.on('closed', (e) => {
         mainWindow = null
     })
+    // 创建quickrun窗口
+    quickrunWindow = new BrowserWindow({
+        id: 2,
+        width: 720,
+        height: 560,
+        frame: false,
+        useContentSize: true,
+        resizable: false,
+        show: true,
+        transparent: true
+    })
+
+    quickrunWindow.loadURL(winURL + '/#/quickrun')
+    quickrunWindow.on('closed', (e) => {
+        quickrunWindow = null
+    })
     // 初始化配置
     Config.save(undefined, () => {
         // 注册快捷键
         Shortcut.registShortCut(mainWindow, 'toggleMain')
+        Shortcut.registShortCut(quickrunWindow, 'toggleQuickrun')
     })
+    // 注册托盘
     registTray()
 }
 
@@ -122,7 +140,17 @@ function toggleStartUp(startup) {
 }
 
 function settings() {
+    if (!mainWindow.isVisible()) {
+        mainWindow.show()
+    }
+    let existsSetting = BrowserWindow.fromId(3)
+    console.log(existsSetting)
+    if (existsSetting !== null) {
+        existsSetting.show()
+        return
+    }
     let child = new BrowserWindow({
+        id: 3,
         width: 600,
         height: 400,
         parent: mainWindow,
@@ -135,10 +163,6 @@ function settings() {
         child.show()
     })
 }
-
-ipcMain.on('hideWindow', () => {
-    mainWindow.hide()
-})
 
 app.on('ready', createWindow)
 

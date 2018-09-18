@@ -5,6 +5,7 @@ import Index from '@/components/LandingPage'
 import List from '@/components/List'
 import Edit from '@/components/Edit'
 import Setting from '@/components/Setting'
+import Quickrun from '@/components/quickrun/Quickrun'
 
 Vue.use(Router)
 
@@ -35,6 +36,11 @@ export default new Router({
             path: '/setting',
             name: 'setting',
             component: Setting
+        },
+        {
+            path: '/quickrun',
+            name: 'quickrun',
+            component: Quickrun
         }
     ]
 })

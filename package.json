@@ -65,7 +65,10 @@
     "vue2-animate": "^2.1.0",
     "nedb": "^1.8.0",
     "electron-clipboard-extended": "^1.1.1",
-    "auto-launch": "^5.0.5"
+    "auto-launch": "^5.0.5",
+    "lodash": "^4.6.0",
+    "lodash.filter": "^4.6.0",
+    "windows-shortcuts": "^0.1.6"
   },
   "devDependencies": {
     "ajv": "^6.5.0",
