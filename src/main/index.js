@@ -40,15 +40,16 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1000,
         height: 563,
+        frame: false,
         useContentSize: true,
         resizable: false,
         show: false,
-        closable: false
+        transparent: true
     })
 
     mainWindow.loadURL(winURL)
 
-    mainWindow.on('close', (e) => {
+    mainWindow.on('closed', (e) => {
         mainWindow = null
     })
     // 初始化配置
@@ -134,6 +135,10 @@ function settings() {
         child.show()
     })
 }
+
+ipcMain.on('hideWindow', () => {
+    mainWindow.hide()
+})
 
 app.on('ready', createWindow)
 

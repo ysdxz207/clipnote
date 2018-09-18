@@ -7,10 +7,12 @@ import App from './App'
 import router from './router'
 import store from './store'
 import db from './db'
+import Directives from './utils/Directives'
 import '../../static/assets/icons/iconfont.css'
 import '../../static/assets/icons/iconfont.js'
 
 Vue.use(ElementUI)
+Vue.use(Directives)
 
 Vue.prototype.bus = new Vue()
 Vue.prototype.$db = db

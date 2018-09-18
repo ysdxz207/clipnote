@@ -1,12 +1,23 @@
 <template>
     <div id="app">
+        <header class="frame-header-bar" @click="hideWindow">
+            <i class="el-icon-close btn-close"></i>
+        </header>
         <router-view></router-view>
     </div>
 </template>
 
 <script>
+    import electron from 'electron'
     export default {
-        name: 'clipnote'
+        name: 'clipnote',
+        mounted() {
+        },
+        methods: {
+            hideWindow() {
+                electron.ipcRenderer.send('hideWindow')
+            }
+        }
     }
 </script>
 
@@ -36,6 +47,43 @@
         padding: 0;
         height: 100%;
         overflow: hidden;
+    }
+
+    body {
+        -webkit-user-select: none;
+    }
+
+    .frame-header-bar {
+        height: 30px;
+        line-height: 30px;
+        width:100%;
+        cursor: move;
+        background-color: #fff0fe;
+        opacity: 0.78;
+        -webkit-app-region: drag;
+        display: flex;
+        flex-direction: row-reverse;
+        flex-wrap: nowrap;
+        justify-content: right;
+        align-items:center;
+    }
+
+    .btn-close {
+        margin-right: 8px;
+        width: 20px;
+        height: 20px;
+        border-radius: 10px;
+        text-align: center;
+        line-height: 20px;
+        color: #FFFFFF;
+        /*float: right;*/
+        cursor: pointer;
+        opacity: 1;
+        background-color: #ff513c;
+        -webkit-app-region: no-drag;
+    }
+    .btn-close:hover {
+        background-color: red;
     }
 
     /*滚动条整体样式*/

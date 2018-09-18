@@ -290,6 +290,7 @@
         height: 100vh;
         font-size: 14px;
         border-right: 1px solid #ECECEC;
+        background-color: #F8F8F8;
 
         display: flex;
         flex-direction: column;
