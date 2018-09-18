@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <header class="frame-header-bar" @click="hideWindow">
-            <i class="el-icon-close btn-close"></i>
+            <i class="el-icon-arrow-down btn-close"></i>
         </header>
         <router-view></router-view>
     </div>
