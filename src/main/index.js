@@ -1,6 +1,7 @@
 'use strict'
 
 import Config from '../renderer/utils/Config'
+import Shortcut from '../renderer/utils/Shortcut'
 
 const electron = require('electron')
 const app = electron.app
@@ -9,6 +10,7 @@ const Tray = electron.Tray
 const AutoLaunch = require('auto-launch')
 const path = require('path')
 const Menu = electron.Menu
+const ipcMain = electron.ipcMain
 
 const ICON_PATH = path.join(__static, 'assets/icons/app/icon.ico')
 
@@ -38,19 +40,30 @@ function createWindow() {
      * Initial window options
      */
     mainWindow = new BrowserWindow({
-        height: 563,
-        useContentSize: true,
         width: 1000,
-        resizable: false
+        height: 563,
+        frame: false,
+        useContentSize: true,
+        resizable: false,
+        show: false,
+        transparent: true
     })
 
     mainWindow.loadURL(winURL)
 
-    mainWindow.on('closed', () => {
+    mainWindow.on('closed', (e) => {
         mainWindow = null
     })
+<<<<<<< HEAD
     mainWindow.openDevTools()
 
+=======
+    // 初始化配置
+    Config.save(undefined, () => {
+        // 注册快捷键
+        Shortcut.registShortCut(mainWindow, 'toggleMain')
+    })
+>>>>>>> 80f8709e824513ed90948bb24e3d1ef23bd72dc5
     registTray()
 }
 
@@ -60,7 +73,7 @@ function registTray() {
         tray = new Tray(ICON_PATH)
         const contextMenu = Menu.buildFromTemplate([
             {
-                label: '关于',
+                label: '源码',
                 type: 'normal',
                 click() {
                     require('electron').shell.openExternal('https://github.com/ysdxz207/clipnote.git')
@@ -93,7 +106,7 @@ function registTray() {
                 }
             }
         ])
-        tray.setToolTip('equickrun')
+        tray.setToolTip('点击显示/隐藏主窗体')
         tray.setContextMenu(contextMenu)
 
         tray.on('click', function (e) {
@@ -137,6 +150,10 @@ function settings() {
     })
     child.openDevTools()
 }
+
+ipcMain.on('hideWindow', () => {
+    mainWindow.hide()
+})
 
 app.on('ready', createWindow)
 

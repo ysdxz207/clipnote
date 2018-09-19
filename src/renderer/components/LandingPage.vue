@@ -17,9 +17,7 @@
 <script>
     import HeaderBar from './HeaderBar'
     import SideBar from './SideBar'
-    import Config from '../utils/Config'
-    import Shortcut from '../utils/Shortcut'
-    import electron from 'electron'
+    import Clipboard from '../utils/Clipboard'
 
     export default {
         name: 'landing-page',
@@ -32,60 +30,17 @@
             _this.bus.$on('configChange', function (type) {
                 if (type === 'clipboardCollection') {
                     // 读取配置监听收集剪贴板
-                    _this.startWatchingCollectionClipboard()
+                    Clipboard.watchOrUnWatch()
                 }
             })
         },
         mounted() {
-            let _this = this
-            // 初始化配置
-            Config.save(undefined, () => {
-                // 读取配置监听收集剪贴板
-                _this.startWatchingCollectionClipboard()
-                // 注册快捷键
-                Shortcut.registShortCut(electron.remote.getCurrentWindow(), 'toggleMain')
-            })
+            // 读取配置监听收集剪贴板
+            Clipboard.watchOrUnWatch()
         },
         methods: {
             open(link) {
                 this.$electron.shell.openExternal(link)
-            },
-            startWatchingCollectionClipboard() {
-                let _this = this
-                Config.read((config) => {
-                    _this.clipboard.off('text-changed')
-                    _this.clipboard.off('image-changed')
-                    _this.clipboard.stopWatching()
-                    if (!config.clipboardCollection) {
-                        return
-                    }
-                    _this.clipboard
-                        .on('text-changed', () => {
-                            let currentText = _this.clipboard.readText()
-                            if (currentText.replace(/\s+/g, '').replace(/[\r\n]/g, '').length === 0) {
-                                return
-                            }
-                            _this.$db.insert({
-                                categoryId: 'clipboard',
-                                type: 'note',
-                                context: currentText,
-                                title: currentText.substring(0, 20),
-                                time: new Date().getTime()
-                            }, (err, newDoc) => {
-                                if (err) {
-                                    _this.$message({
-                                        type: 'error',
-                                        message: '收集粘贴板失败：' + err
-                                    })
-                                }
-                            })
-                        })
-                        .on('image-changed', () => {
-                            let currentIMage = _this.clipboard.readImage()
-                            console.log(currentIMage)
-                        })
-                        .startWatching()
-                })
             }
         }
     }

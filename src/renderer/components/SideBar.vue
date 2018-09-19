@@ -94,7 +94,7 @@
         },
         mounted() {
             let _this = this
-            // 初始化默认分类
+            // 初始化[全部]分类
             _this.initDefaultCategory()
             _this.loadCategoryList((categoryList) => {
                 // 默认打开第一个分类下列表
@@ -123,7 +123,7 @@
                         })
                     } else {
                         if (!docs || docs.length === 0) {
-                            defaultCategory.name = '默认分类'
+                            defaultCategory.name = '全部笔记'
                             _this.$db.insert(defaultCategory, (err, newDoc) => {
                                 if (err) {
                                     _this.$message({
@@ -290,6 +290,7 @@
         height: 100vh;
         font-size: 14px;
         border-right: 1px solid #ECECEC;
+        background-color: #F8F8F8;
 
         display: flex;
         flex-direction: column;

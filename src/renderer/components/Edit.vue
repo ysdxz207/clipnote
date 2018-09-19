@@ -71,10 +71,10 @@
                         } else {
                             // 添加成功跳转到对应分类
                             _this.$router.push({name: 'list', query: {type: _this.note.type, categoryId: _this.note.categoryId}})
-                            _this.$message({
-                                type: 'success',
-                                message: '修改笔记成功'
-                            })
+                            // _this.$message({
+                            //     type: 'success',
+                            //     message: '修改笔记成功'
+                            // })
                         }
                     })
                 } else {
