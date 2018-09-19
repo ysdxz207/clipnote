@@ -2,6 +2,7 @@
 
 import Config from '../renderer/utils/Config'
 import Shortcut from '../renderer/utils/Shortcut'
+import Constants from '../renderer/utils/Constants'
 
 const electron = require('electron')
 const app = electron.app
@@ -22,9 +23,7 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 let mainWindow, quickrunWindow, tray
-const winURL = process.env.NODE_ENV === 'development'
-    ? `http://localhost:9080`
-    : `file://${__dirname}/index.html`
+const winURL = Constants.URL.index
 
 const settingURL = winURL + '#/setting'
 const quickrunURL = winURL + '#/quickrun'
@@ -47,6 +46,7 @@ function createWindow() {
         useContentSize: true,
         resizable: false,
         show: false,
+        alwaysOnTop: true,
         transparent: true
     })
 
@@ -65,6 +65,7 @@ function createWindow() {
         resizable: false,
         show: true,
         transparent: true,
+        alwaysOnTop: true,
         webPreferences: {
             webSecurity: false
         }

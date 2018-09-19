@@ -6,6 +6,7 @@ import List from '@/components/List'
 import Edit from '@/components/Edit'
 import Setting from '@/components/Setting'
 import Quickrun from '@/components/quickrun/Quickrun'
+import QuickrunEdit from '@/components/quickrun/QuickrunEdit'
 
 Vue.use(Router)
 
@@ -41,6 +42,11 @@ export default new Router({
             path: '/quickrun',
             name: 'quickrun',
             component: Quickrun
+        },
+        {
+            path: '/quickrun/edit',
+            name: 'quickrunEdit',
+            component: QuickrunEdit
         }
     ]
 })

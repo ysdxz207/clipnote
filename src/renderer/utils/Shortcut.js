@@ -40,6 +40,9 @@ shortcut.registShortCut = function(windowObj, key, conf) {
             const ret = globalShortcut.register(hotkey, () => {
                 if (windowObj.isVisible()) {
                     windowObj.hide()
+                    windowObj.getChildWindows().forEach((win) => {
+                        win.hide()
+                    })
                 } else {
                     windowObj.show()
                 }

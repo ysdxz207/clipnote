@@ -12,20 +12,22 @@
     import electron from 'electron'
     import fs from 'fs'
     import EIconExtractor from '../../utils/EIconExtractor'
+    import Constants from '../../utils/Constants'
     const windowsShortcuts = require('windows-shortcuts')
     const filter = require('lodash.filter')
     const childProcess = require('child_process')
     const dialog = electron.remote.dialog
     const BrowserWindow = electron.remote.BrowserWindow
-    const path = require('path')
-    const url = require('url')
 
     export default {
         data() {
             return {
                 type: 'shortcut',
-                shortcutList: []
+                shortcutList: [],
+                editWindow: null
             }
+        },
+        created() {
         },
         mounted() {
             let _this = this
@@ -44,17 +46,56 @@
             })
             document.addEventListener('drop', _this.onDropFiles)
 
-            _this.$db.find({
-                type: _this.type
-            }).sort({
-                id: -1
-            }).exec((err, docs) => {
-                if (!err) {
-                    _this.shortcutList = docs
-                }
-            })
+            // 加载列表
+            _this.loadQuickrunList()
+            // 创建编辑窗口
+            _this.createEditWindow()
         },
         methods: {
+            createEditWindow() {
+                let _this = this
+                let editWindow = BrowserWindow.fromId(3)
+                if (editWindow != null) {
+                    _this.editWindow = editWindow
+                    return
+                }
+                editWindow = new BrowserWindow({
+                    id: 3,
+                    show: false,
+                    frame: false,
+                    parent: electron.remote.getCurrentWindow(),
+                    modal: true,
+                    resizable: false,
+                    width: 800,
+                    height: 300
+                })
+
+                editWindow.setMenu(null)
+                editWindow.webContents.openDevTools()
+                editWindow.loadURL(Constants.URL.index + '#/quickrun/edit')
+
+                editWindow.once('hide', (e) => {
+                    // 编辑窗口隐藏，重新加载列表
+                    _this.loadQuickrunList()
+                })
+                _this.editWindow = editWindow
+            },
+            loadQuickrunList() {
+                let _this = this
+                _this.$db.find({
+                    type: _this.type
+                }).sort({
+                    id: -1
+                }).exec((err, docs) => {
+                    if (!err) {
+                        // _this.shortcutList = []
+                        _this.shortcutList = JSON.parse(JSON.stringify(docs))
+                        console.log(_this.shortcutList)
+                    } else {
+                        console.error(err)
+                    }
+                })
+            },
             checkEShortcutExists(name) {
                 let result = filter(this.shortcutList, x => x.name === name)
                 if (result.length > 0) {
@@ -85,9 +126,7 @@
                 let _this = this
                 let fileList = e.dataTransfer.files
 
-                let list = []
-
-                for (var i = 0; i < fileList.length; i++) {
+                for (let i = 0; i < fileList.length; i++) {
                     let eshortcut = {}
                     let file = fileList[i]
                     let name = file.name
@@ -124,7 +163,7 @@
                             if (icon) {
                                 eshortcut.icon = 'data:image/png;base64,' + icon
                             }
-                            list.push(eshortcut)
+                            _this.shortcutList.push(eshortcut)
 
                             // 保存数据库
                             _this.$db.insert(eshortcut, (err, newDoc) => {
@@ -136,36 +175,11 @@
                     })
                 }
             },
-            showEditDialog(eshortcut) {
-                let editWindow = new BrowserWindow({
-                    id: 'window_edit_eshortcut',
-                    parent: electron.remote.getCurrentWindow(),
-                    modal: true,
-                    resizable: false,
-                    width: 562,
-                    height: 272,
-                    // width: 900,
-                    // height: 600,
-                    webPreferences: {
-
-                        devTools: false
-                    }
-                })
-
-                editWindow.setMenu(null)
-
-                editWindow.loadURL(url.format({
-                    pathname: path.join(__dirname, '/app/edit.html'),
-                    protocol: 'file:',
-                    slashes: true
-                }))
-
-                editWindow.webContents.on('did-finish-load', () => {
-                    editWindow.webContents.send('eshortcut', eshortcut)
-                })
-                editWindow.show()
-
-                editWindow.webContents.openDevTools()
+            showEditDialog(shortcut) {
+                let _this = this
+                _this.editWindow.webContents.send('shortcut', shortcut.id)
+                _this.editWindow.show()
+                console.log('edit:' + shortcut.id)
             },
             setSelected(index) {
                 let selectedList = document.querySelectorAll('.quickrun-ul li')
@@ -192,10 +206,12 @@
 
 <style scoped>
     ul {
-        background-color: lightpink;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        background-color: #e0ffdc;
         opacity: 0.78;
         list-style: none;
-        padding: 0;
         /*禁止浏览器选择文本,防止双击选中文本*/
         -webkit-touch-callout: none;
         -webkit-user-select: none;
@@ -219,7 +235,7 @@
     }
 
     li:hover {
-        background-color: aqua;
+        background-color: #cef5ff;
     }
 
 </style>
