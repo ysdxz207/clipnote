@@ -159,6 +159,7 @@ function settings() {
         width: 600,
         height: 400,
         parent: mainWindow,
+        frame: false,
         modal: true,
         show: false,
         resizable: false,
@@ -170,7 +171,7 @@ function settings() {
     child.once('ready-to-show', () => {
         child.show()
     })
-    child.openDevTools()
+    // child.openDevTools()
 }
 
 app.on('ready', createWindow)

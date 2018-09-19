@@ -192,6 +192,8 @@
 
 <style scoped>
     ul {
+        background-color: lightpink;
+        opacity: 0.78;
         list-style: none;
         padding: 0;
         /*禁止浏览器选择文本,防止双击选中文本*/
