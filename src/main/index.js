@@ -61,13 +61,20 @@ function createWindow() {
         useContentSize: true,
         resizable: false,
         show: true,
-        transparent: true
+        transparent: true,
+        webPreferences: {
+            webSecurity: false
+        }
     })
-
-    quickrunWindow.loadURL(winURL + '/#/quickrun')
+    if (process.env.NODE_ENV === 'development') {
+        quickrunWindow.loadURL(winURL + '/#/quickrun')
+    } else {
+        quickrunWindow.loadFile(winURL + '/#/quickrun')
+    }
     quickrunWindow.on('closed', (e) => {
         quickrunWindow = null
     })
+    quickrunWindow.openDevTools()
     // 初始化配置
     Config.save(undefined, () => {
         // 注册快捷键
@@ -156,12 +163,16 @@ function settings() {
         parent: mainWindow,
         modal: true,
         show: false,
-        resizable: false
+        resizable: false,
+        webPreferences: {
+            webSecurity: false
+        }
     })
     child.loadURL(winURL + '/#/setting')
     child.once('ready-to-show', () => {
         child.show()
     })
+    child.openDevTools()
 }
 
 app.on('ready', createWindow)
