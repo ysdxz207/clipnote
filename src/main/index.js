@@ -26,6 +26,8 @@ const winURL = process.env.NODE_ENV === 'development'
     ? `http://localhost:9080`
     : `file://${__dirname}/index.html`
 
+const settingURL = winURL + '/#/setting'
+
 // 开机启动
 var clipnoteAutoLauncher = new AutoLaunch({
     name: app.getName(),
@@ -151,7 +153,6 @@ function settings() {
         mainWindow.show()
     }
     let existsSetting = BrowserWindow.fromId(3)
-    console.log(existsSetting)
     if (existsSetting !== null) {
         existsSetting.show()
         return
@@ -168,7 +169,7 @@ function settings() {
             webSecurity: false
         }
     })
-    child.loadURL(winURL + '/#/setting')
+    child.loadURL(settingURL)
     child.once('ready-to-show', () => {
         child.show()
     })
