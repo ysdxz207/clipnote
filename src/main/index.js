@@ -25,6 +25,8 @@ const winURL = process.env.NODE_ENV === 'development'
     ? `http://localhost:9080`
     : `file://${__dirname}/index.html`
 
+const settingURL = winURL + '/#/setting'
+
 // 开机启动
 var clipnoteAutoLauncher = new AutoLaunch({
     name: app.getName(),
@@ -47,6 +49,7 @@ function createWindow() {
     mainWindow.on('closed', () => {
         mainWindow = null
     })
+    mainWindow.openDevTools()
 
     registTray()
 }
@@ -114,17 +117,25 @@ function toggleStartUp(startup) {
 
 function settings() {
     let child = new BrowserWindow({
-        width: 600,
-        height: 400,
+        width: 1000,
+        height: 600,
         parent: mainWindow,
         modal: true,
         show: false,
-        resizable: false
+        resizable: false,
+        webPreferences: {
+            webSecurity: false
+        }
     })
-    child.loadURL(winURL + '/#/setting')
+    if (process.env.NODE_ENV === 'development') {
+        child.loadURL(settingURL)
+    } else {
+        child.loadFile(settingURL)
+    }
     child.once('ready-to-show', () => {
         child.show()
     })
+    child.openDevTools()
 }
 
 app.on('ready', createWindow)
