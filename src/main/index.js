@@ -26,7 +26,8 @@ const winURL = process.env.NODE_ENV === 'development'
     ? `http://localhost:9080`
     : `file://${__dirname}/index.html`
 
-const settingURL = winURL + '/#/setting'
+const settingURL = winURL + '#/setting'
+const quickrunURL = winURL + '#/quickrun'
 
 // 开机启动
 var clipnoteAutoLauncher = new AutoLaunch({
@@ -68,15 +69,11 @@ function createWindow() {
             webSecurity: false
         }
     })
-    if (process.env.NODE_ENV === 'development') {
-        quickrunWindow.loadURL(winURL + '/#/quickrun')
-    } else {
-        quickrunWindow.loadFile(winURL + '/#/quickrun')
-    }
+    quickrunWindow.loadURL(quickrunURL)
     quickrunWindow.on('closed', (e) => {
         quickrunWindow = null
     })
-    quickrunWindow.openDevTools()
+    // quickrunWindow.openDevTools()
     // 初始化配置
     Config.save(undefined, () => {
         // 注册快捷键
