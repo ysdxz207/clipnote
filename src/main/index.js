@@ -54,16 +54,11 @@ function createWindow() {
     mainWindow.on('closed', (e) => {
         mainWindow = null
     })
-<<<<<<< HEAD
-    mainWindow.openDevTools()
-
-=======
     // 初始化配置
     Config.save(undefined, () => {
         // 注册快捷键
         Shortcut.registShortCut(mainWindow, 'toggleMain')
     })
->>>>>>> 80f8709e824513ed90948bb24e3d1ef23bd72dc5
     registTray()
 }
 
