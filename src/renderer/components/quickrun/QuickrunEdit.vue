@@ -36,42 +36,35 @@
         created() {
         },
         mounted() {
-            electron.ipcRenderer.on('shortcut', (event, id) => {
-                this.loadShortcut(id)
+            electron.ipcRenderer.on('shortcut', (event, shortcut) => {
+                this.shortcutTemp = JSON.parse(JSON.stringify(shortcut))
+                this.shortcut = shortcut
             })
         },
         methods: {
-            loadShortcut(id) {
-                let _this = this
-                _this.$db.findOne({
-                    type: 'shortcut',
-                    id: id
-                }, (err, docs) => {
-                    if (err) {
-                        _this.$message({
-                            type: 'error',
-                            message: '快捷方式加载失败：' + err
-                        })
-                    } else {
-                        _this.shortcut = docs
-                        _this.shortcutTemp = JSON.parse(JSON.stringify(docs))
-                    }
-                })
-            },
             editShortcut() {
                 let _this = this
-                _this.$db.update(_this.shortcutTemp, _this.shortcut, {}, (err, num) => {
-                    if (err) {
-                        _this.$message({
-                            type: 'error',
-                            message: '修改快捷方式失败：' + err
-                        })
-                    } else {
-                        electron.remote.getCurrentWindow().hide()
-                    }
+                electron.ipcRenderer.send('shortcutEdit', {
+                    source: _this.shortcutTemp,
+                    target: _this.shortcut
                 })
+                electron.remote.getCurrentWindow().hide()
             },
             getIcon() {
+                let _this = this
+                electron.remote.dialog.showOpenDialog(electron.remote.getCurrentWindow(), {
+                    title: '选择图标',
+                    properties: ['openFile'],
+                    filters: [
+                        {name: 'Images', extensions: ['jpg', 'png', 'gif', 'ico']}
+                    ]
+                }, function (filePaths) {
+                    let base64 = require('fs').readFileSync(filePaths[0]).toString('base64')
+                    if (base64) {
+                        base64 = 'data:image/png;base64,' + base64
+                        _this.shortcut.icon = base64
+                    }
+                })
             }
         }
     }

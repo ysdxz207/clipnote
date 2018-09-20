@@ -51,6 +51,20 @@
             _this.loadQuickrunList()
             // 创建编辑窗口
             _this.createEditWindow()
+            // 修改快捷方式
+            electron.remote.ipcMain.on('shortcutEdit', (event, o) => {
+                console.log('edit:', o)
+                _this.$db.update(o.source, o.target, {}, (err, num) => {
+                    if (err) {
+                        _this.$message({
+                            type: 'error',
+                            message: '修改快捷方式失败：' + err
+                        })
+                    } else {
+                        _this.loadQuickrunList()
+                    }
+                })
+            })
         },
         methods: {
             createEditWindow() {
@@ -75,10 +89,6 @@
                 editWindow.webContents.openDevTools()
                 editWindow.loadURL(Constants.URL.index + '#/quickrun/edit')
 
-                editWindow.once('hide', (e) => {
-                    // 编辑窗口隐藏，重新加载列表
-                    _this.loadQuickrunList()
-                })
                 _this.editWindow = editWindow
             },
             loadQuickrunList() {
@@ -118,7 +128,7 @@
                 path = eshortcut.args ? path + ' ' + eshortcut.args : path
                 childProcess.exec('start ' + path, function (err, data) {
                     if (err) {
-                        dialog.showErrorBox('错误', '运行[' + eshortcut.name + ']失败了：' + err)
+                        // dialog.showErrorBox('错误', '运行[' + eshortcut.name + ']失败了：' + err)
                     }
                     // console.log(data.toString())
                 })
@@ -178,7 +188,7 @@
             },
             showEditDialog(shortcut) {
                 let _this = this
-                _this.editWindow.webContents.send('shortcut', shortcut.id)
+                _this.editWindow.webContents.send('shortcut', shortcut)
                 _this.editWindow.show()
                 console.log('edit:' + shortcut.id)
             },

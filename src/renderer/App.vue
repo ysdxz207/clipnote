@@ -58,7 +58,7 @@
         line-height: 30px;
         width:100%;
         background-color: #222222;
-        opacity: 0.78;
+        opacity: 1;
         -webkit-app-region: drag;
         display: flex;
         flex-direction: row-reverse;
