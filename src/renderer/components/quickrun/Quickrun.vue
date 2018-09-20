@@ -69,24 +69,26 @@
         methods: {
             createEditWindow() {
                 let _this = this
-                let editWindow = BrowserWindow.fromId(3)
-                if (editWindow != null) {
+                let editWindow = BrowserWindow.fromId(_this.Constants.ID.QUICKRUN_EDIT)
+                if (editWindow) {
                     _this.editWindow = editWindow
                     return
                 }
                 editWindow = new BrowserWindow({
-                    id: 3,
                     show: false,
                     frame: false,
                     parent: electron.remote.getCurrentWindow(),
                     modal: true,
                     resizable: false,
-                    width: 520,
+                    width: process.env.debug ? 1000 : 520,
                     height: 320
                 })
 
+                _this.Constants.ID.QUICKRUN_EDIT = editWindow.id
                 editWindow.setMenu(null)
-                // editWindow.webContents.openDevTools()
+                if (process.env.debug) {
+                    editWindow.webContents.openDevTools()
+                }
                 editWindow.loadURL(Constants.URL.index + '#/quickrun/edit')
 
                 _this.editWindow = editWindow
@@ -108,7 +110,9 @@
                 })
             },
             checkEShortcutExists(name) {
+                console.log('是否存在', name)
                 let result = filter(this.shortcutList, x => x.name === name)
+                console.log('是否存在', result)
                 if (result.length > 0) {
                     return true
                 }
@@ -174,11 +178,11 @@
                             if (icon) {
                                 eshortcut.icon = 'data:image/png;base64,' + icon
                             }
-                            _this.shortcutList.push(eshortcut)
 
                             // 保存数据库
                             _this.$db.insert(eshortcut, (err, newDoc) => {
                                 if (!err) {
+                                    _this.loadQuickrunList()
                                     console.log(newDoc)
                                 }
                             })

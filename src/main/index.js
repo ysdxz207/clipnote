@@ -39,8 +39,8 @@ function createWindow() {
      * Initial window options
      */
     mainWindow = new BrowserWindow({
-        id: 1,
-        width: 830,
+        title: Constants.TITLE.MAIN,
+        width: process.env.debug ? 1000 : 830,
         height: 562,
         frame: false,
         useContentSize: true,
@@ -50,6 +50,7 @@ function createWindow() {
         transparent: true
     })
 
+    Constants.ID.MAIN = mainWindow.id
     mainWindow.loadURL(winURL)
 
     mainWindow.on('closed', (e) => {
@@ -57,8 +58,7 @@ function createWindow() {
     })
     // 创建quickrun窗口
     quickrunWindow = new BrowserWindow({
-        id: 2,
-        width: 220,
+        width: process.env.debug ? 720 : 220,
         height: 560,
         frame: false,
         useContentSize: true,
@@ -70,11 +70,14 @@ function createWindow() {
             webSecurity: false
         }
     })
+    Constants.ID.QUICKRUN = quickrunWindow.id
     quickrunWindow.loadURL(quickrunURL)
     quickrunWindow.on('closed', (e) => {
         quickrunWindow = null
     })
-    // quickrunWindow.openDevTools()
+    if (process.env.debug) {
+        quickrunWindow.openDevTools()
+    }
     // 初始化配置
     Config.save(undefined, () => {
         // 注册快捷键
@@ -90,6 +93,19 @@ function registTray() {
     Config.read((conf) => {
         tray = new Tray(ICON_PATH)
         const contextMenu = Menu.buildFromTemplate([
+            {
+                label: '关于',
+                type: 'normal',
+                click() {
+                    if (!mainWindow.isVisible()) {
+                        mainWindow.show()
+                    }
+                    electron.dialog.showMessageBox(mainWindow, {
+                        type: 'info',
+                        message: '当前版本：' + require('../../package').version
+                    })
+                }
+            },
             {
                 label: '源码',
                 type: 'normal',
@@ -150,14 +166,14 @@ function settings() {
     if (!mainWindow.isVisible()) {
         mainWindow.show()
     }
-    let existsSetting = BrowserWindow.fromId(3)
-    if (existsSetting !== null) {
+    let existsSetting = BrowserWindow.fromId(Constants.ID.SETTING)
+    if (existsSetting) {
         existsSetting.show()
         return
     }
-    let child = new BrowserWindow({
-        id: 3,
-        width: 600,
+    let settingWindow = new BrowserWindow({
+        title: Constants.TITLE.SETTING,
+        width: process.env.debug ? 1000 : 600,
         height: 400,
         parent: mainWindow,
         frame: false,
@@ -168,11 +184,14 @@ function settings() {
             webSecurity: false
         }
     })
-    child.loadURL(settingURL)
-    child.once('ready-to-show', () => {
-        child.show()
+    Constants.ID.SETTING = settingWindow.id
+    settingWindow.loadURL(settingURL)
+    settingWindow.once('ready-to-show', () => {
+        settingWindow.show()
     })
-    // child.openDevTools()
+    if (process.env.debug) {
+        settingWindow.openDevTools()
+    }
 }
 
 app.on('ready', createWindow)

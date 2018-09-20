@@ -88,7 +88,10 @@
                 _this.$watch('setting.hotkey.toggleQuickrun', {
                     deep: true,
                     handler: function () {
-                        let windowObj = electron.remote.BrowserWindow.fromId(2)
+                        console.log('quickrun window id', _this.Constants.ID.QUICKRUN)
+                        let windowObj = electron.remote.BrowserWindow.fromId(_this.Constants.ID.QUICKRUN)
+                        console.log('all windows', electron.remote.BrowserWindow.getAllWindows())
+                        console.log('quickru window', windowObj)
                         Shortcut.registShortCut(windowObj,
                             'toggleQuickrun', _this.setting)
                             .then(() => {
