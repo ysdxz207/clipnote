@@ -13,6 +13,7 @@
     import fs from 'fs'
     import EIconExtractor from '../../utils/EIconExtractor'
     import Constants from '../../utils/Constants'
+
     const windowsShortcuts = require('windows-shortcuts')
     const filter = require('lodash.filter')
     const childProcess = require('child_process')
@@ -219,23 +220,23 @@
         -ms-user-select: none;
         user-select: none;
     }
+
     li {
         height: 24px;
         line-height: 24px;
-        border-bottom: 1px solid #DDDDDD;
+        /*border-bottom: 1px solid #F2F2F2;*/
         list-style: none;
         cursor: pointer;
         padding-left: 2px;
         overflow: hidden;
-        -ms-text-overflow: ellipsis;/*省略号*/
-        text-overflow: ellipsis;/*省略号*/
-        display:block;
-        font-size:18px;
-        white-space:nowrap;/*强制不换行*/
+        -ms-text-overflow: ellipsis; /*省略号*/
+        text-overflow: ellipsis; /*省略号*/
+        font-size: 18px;
+        white-space: nowrap; /*强制不换行*/
     }
 
     li:hover {
-        background-color: #cef5ff;
+        background-color: #a2f2ff;
     }
 
 </style>

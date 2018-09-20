@@ -43,7 +43,7 @@
         z-index: 1;
         color: #232323;
         line-height: 40px;
-        background-color: #F8F8F8;
+        background-color: #FAFAFA;
         height: 100%;
         box-shadow: 0 1px 4px rgba(0,0,0,.25);
     }

@@ -199,6 +199,7 @@
         height: 40px;
         line-height: 40px;
         border-bottom: 1px solid #EFEFEF;
+        background-color: #FDFDFD;
     }
 
     .list .item-title-group {
