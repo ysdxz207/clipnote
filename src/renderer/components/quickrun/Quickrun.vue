@@ -221,7 +221,6 @@
         padding: 0;
         height: 100vh;
         background-color: #e0ffdc;
-        opacity: 0.78;
         list-style: none;
         /*禁止浏览器选择文本,防止双击选中文本*/
         -webkit-touch-callout: none;

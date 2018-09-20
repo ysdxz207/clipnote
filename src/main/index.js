@@ -40,8 +40,8 @@ function createWindow() {
      */
     mainWindow = new BrowserWindow({
         id: 1,
-        width: 1000,
-        height: 563,
+        width: 830,
+        height: 562,
         frame: false,
         useContentSize: true,
         resizable: false,
@@ -58,7 +58,7 @@ function createWindow() {
     // 创建quickrun窗口
     quickrunWindow = new BrowserWindow({
         id: 2,
-        width: 720,
+        width: 220,
         height: 560,
         frame: false,
         useContentSize: true,
