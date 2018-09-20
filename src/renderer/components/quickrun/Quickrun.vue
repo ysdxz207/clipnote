@@ -81,12 +81,12 @@
                     parent: electron.remote.getCurrentWindow(),
                     modal: true,
                     resizable: false,
-                    width: 800,
-                    height: 300
+                    width: 520,
+                    height: 320
                 })
 
                 editWindow.setMenu(null)
-                editWindow.webContents.openDevTools()
+                // editWindow.webContents.openDevTools()
                 editWindow.loadURL(Constants.URL.index + '#/quickrun/edit')
 
                 _this.editWindow = editWindow
