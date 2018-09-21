@@ -1,13 +1,13 @@
-import db from '../db'
+// import electron from 'electron'
 import Config from './Config'
+const db = Config.$db
 
 const clipboard = require('electron-clipboard-extended')
 
 const clip = {}
 
 clip.watchOrUnWatch = function (callback) {
-    console.log('start watch')
-    Config.read((config) => {
+    Config.read().then((config) => {
         clipboard.off('text-changed')
         clipboard.off('image-changed')
         clipboard.stopWatching()
@@ -37,6 +37,8 @@ clip.watchOrUnWatch = function (callback) {
                 console.log(currentIMage)
             })
             .startWatching()
+    }).catch(err => {
+        console.error(err)
     })
 }
 

@@ -4,7 +4,7 @@ const URL = {
         : `file://${__dirname}/index.html`
 }
 
-const TITLE = {
+const NAME = {
     MAIN: 'main_window',
     EDIT: 'edit',
     SETTING: 'setting',
@@ -12,16 +12,7 @@ const TITLE = {
     QUICKRUN_EDIT: 'quickrun_edit'
 }
 
-let ID = {
-    MAIN: 0,
-    EDIT: 0,
-    SETTING: 0,
-    QUICKRUN: 0,
-    QUICKRUN_EDIT: 0
-}
-
 export default {
     URL,
-    ID,
-    TITLE
+    NAME
 }

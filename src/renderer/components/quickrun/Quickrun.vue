@@ -13,12 +13,11 @@
     import fs from 'fs'
     import EIconExtractor from '../../utils/EIconExtractor'
     import Constants from '../../utils/Constants'
+    var windowManager = electron.remote.require('electron-window-manager')
 
     const windowsShortcuts = require('windows-shortcuts')
-    const filter = require('lodash.filter')
     const childProcess = require('child_process')
     const dialog = electron.remote.dialog
-    const BrowserWindow = electron.remote.BrowserWindow
 
     export default {
         data() {
@@ -51,7 +50,7 @@
             _this.loadQuickrunList()
             // 创建编辑窗口
             _this.createEditWindow()
-            // 修改快捷方式
+            // 修改快捷方式，放在quickrunEdit里会数据不同步
             electron.remote.ipcMain.on('shortcutEdit', (event, o) => {
                 console.log('edit:', o)
                 _this.$db.update(o.source, o.target, {}, (err, num) => {
@@ -69,27 +68,24 @@
         methods: {
             createEditWindow() {
                 let _this = this
-                let editWindow = BrowserWindow.fromId(_this.Constants.ID.QUICKRUN_EDIT)
+                let editWindow = windowManager.get(_this.Constants.NAME.QUICKRUN_EDIT).object
                 if (editWindow) {
                     _this.editWindow = editWindow
                     return
                 }
-                editWindow = new BrowserWindow({
+                editWindow = windowManager.createNew(_this.Constants.NAME, '', Constants.URL.index + '#/quickrun/edit', false, {
                     show: false,
                     frame: false,
                     parent: electron.remote.getCurrentWindow(),
                     modal: true,
                     resizable: false,
-                    width: process.env.debug ? 1000 : 520,
+                    width: process.env.DEBUG === 'yes' ? 1000 : 520,
                     height: 320
-                })
+                }).create().object
 
-                _this.Constants.ID.QUICKRUN_EDIT = editWindow.id
-                editWindow.setMenu(null)
-                if (process.env.debug) {
+                if (process.env.DEBUG === 'yes') {
                     editWindow.webContents.openDevTools()
                 }
-                editWindow.loadURL(Constants.URL.index + '#/quickrun/edit')
 
                 _this.editWindow = editWindow
             },
@@ -111,8 +107,8 @@
             },
             checkEShortcutExists(name) {
                 console.log('是否存在', name)
-                let result = filter(this.shortcutList, x => x.name === name)
-                console.log('是否存在', result)
+                let result = this.shortcutList.filter(x => x.name === name)
+                console.log('是否存在', result.length > 0)
                 if (result.length > 0) {
                     return true
                 }

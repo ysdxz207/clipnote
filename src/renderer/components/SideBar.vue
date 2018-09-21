@@ -267,17 +267,21 @@
             },
             loadClipboardCollection() {
                 let _this = this
-                Config.read((config) => {
+                Config.read().then((config) => {
                     _this.conf = config
                     _this.$watch('conf.clipboardCollection', {
                         deep: true,
                         handler: function () {
                             console.log('change clipboardCollection')
-                            Config.save(_this.conf, () => {
+                            Config.save(_this.conf).then(() => {
                                 _this.bus.$emit('configChange', 'clipboardCollection')
+                            }).catch(err => {
+                                console.error(err)
                             })
                         }
                     })
+                }).catch(err => {
+                    console.error(err)
                 })
             }
         }

@@ -3,14 +3,13 @@
 import Config from '../renderer/utils/Config'
 import Shortcut from '../renderer/utils/Shortcut'
 import Constants from '../renderer/utils/Constants'
-
 const electron = require('electron')
 const app = electron.app
-const BrowserWindow = electron.BrowserWindow
 const Tray = electron.Tray
 const AutoLaunch = require('auto-launch')
 const path = require('path')
 const Menu = electron.Menu
+const windowManager = require('electron-window-manager')
 
 const ICON_PATH = path.join(__static, 'assets/icons/app/icon.ico')
 
@@ -22,7 +21,7 @@ if (process.env.NODE_ENV !== 'development') {
     global.__static = path.join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-let mainWindow, quickrunWindow, tray
+let mainWindow, quickrunWindow, settingsWindow, tray
 const winURL = Constants.URL.index
 
 const settingURL = winURL + '#/setting'
@@ -34,13 +33,11 @@ var clipnoteAutoLauncher = new AutoLaunch({
     path: process.cwd() + path.sep + app.getName() + '.exe'
 })
 
-function createWindow() {
-    /**
-     * Initial window options
-     */
-    mainWindow = new BrowserWindow({
-        title: Constants.TITLE.MAIN,
-        width: process.env.debug ? 1000 : 830,
+function init() {
+    // 创建笔记窗口
+    windowManager.init({})
+    mainWindow = windowManager.createNew(Constants.NAME.MAIN, '', winURL, false, {
+        width: process.env.DEBUG === 'yes' ? 1000 : 830,
         height: 562,
         frame: false,
         useContentSize: true,
@@ -48,17 +45,16 @@ function createWindow() {
         show: false,
         alwaysOnTop: true,
         transparent: true
-    })
+    }).create().object
 
-    Constants.ID.MAIN = mainWindow.id
-    mainWindow.loadURL(winURL)
+    console.log('window,', mainWindow)
 
     mainWindow.on('closed', (e) => {
         mainWindow = null
     })
     // 创建quickrun窗口
-    quickrunWindow = new BrowserWindow({
-        width: process.env.debug ? 720 : 220,
+    quickrunWindow = windowManager.createNew(Constants.NAME.QUICKRUN, '', quickrunURL, false, {
+        width: process.env.DEBUG === 'yes' ? 720 : 220,
         height: 560,
         frame: false,
         useContentSize: true,
@@ -69,20 +65,36 @@ function createWindow() {
         webPreferences: {
             webSecurity: false
         }
-    })
-    Constants.ID.QUICKRUN = quickrunWindow.id
-    quickrunWindow.loadURL(quickrunURL)
+    }).create().object
     quickrunWindow.on('closed', (e) => {
         quickrunWindow = null
     })
-    if (process.env.debug) {
+    if (process.env.DEBUG === 'yes') {
         quickrunWindow.openDevTools()
     }
+    // 创建设置窗口
+    settingsWindow = windowManager.createNew(Constants.NAME.SETTING, '', settingURL, false, {
+        width: process.env.DEBUG === 'yes' ? 1000 : 600,
+        height: 400,
+        parent: mainWindow,
+        frame: false,
+        modal: true,
+        show: false,
+        resizable: false,
+        webPreferences: {
+            webSecurity: false
+        }
+    }).create().object
+    if (process.env.DEBUG === 'yes') {
+        settingsWindow.openDevTools()
+    }
     // 初始化配置
-    Config.save(undefined, () => {
+    Config.save().then(() => {
         // 注册快捷键
         Shortcut.registShortCut(mainWindow, 'toggleMain')
         Shortcut.registShortCut(quickrunWindow, 'toggleQuickrun')
+    }).catch(err => {
+        console.error(err)
     })
     // 注册托盘
     registTray()
@@ -90,7 +102,7 @@ function createWindow() {
 
 function registTray() {
     // 读取配置
-    Config.read((conf) => {
+    Config.read().then((conf) => {
         tray = new Tray(ICON_PATH)
         const contextMenu = Menu.buildFromTemplate([
             {
@@ -117,7 +129,10 @@ function registTray() {
                 label: '设置',
                 type: 'normal',
                 click() {
-                    settings()
+                    if (!mainWindow.isVisible()) {
+                        mainWindow.show()
+                    }
+                    settingsWindow.show()
                 }
             },
             {
@@ -126,9 +141,11 @@ function registTray() {
                 checked: conf['startup'],
                 click(menuItem) {
                     conf['startup'] = menuItem.checked
-                    Config.save(conf, function () {
+                    Config.save(conf).then(function () {
                         // 处理开机启动项
                         toggleStartUp(menuItem.checked)
+                    }).catch(err => {
+                        console.error(err)
                     })
                 }
             },
@@ -151,6 +168,8 @@ function registTray() {
                 mainWindow.show()
             }
         })
+    }).catch(err => {
+        console.error(err)
     })
 }
 
@@ -162,39 +181,7 @@ function toggleStartUp(startup) {
     }
 }
 
-function settings() {
-    if (!mainWindow.isVisible()) {
-        mainWindow.show()
-    }
-    let existsSetting = BrowserWindow.fromId(Constants.ID.SETTING)
-    if (existsSetting) {
-        existsSetting.show()
-        return
-    }
-    let settingWindow = new BrowserWindow({
-        title: Constants.TITLE.SETTING,
-        width: process.env.debug ? 1000 : 600,
-        height: 400,
-        parent: mainWindow,
-        frame: false,
-        modal: true,
-        show: false,
-        resizable: false,
-        webPreferences: {
-            webSecurity: false
-        }
-    })
-    Constants.ID.SETTING = settingWindow.id
-    settingWindow.loadURL(settingURL)
-    settingWindow.once('ready-to-show', () => {
-        settingWindow.show()
-    })
-    if (process.env.debug) {
-        settingWindow.openDevTools()
-    }
-}
-
-app.on('ready', createWindow)
+app.on('ready', init)
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
@@ -204,7 +191,7 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
     if (mainWindow === null) {
-        createWindow()
+        init()
     }
 })
 

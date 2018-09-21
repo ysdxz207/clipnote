@@ -51,6 +51,8 @@
     import Shortcut from '../utils/Shortcut'
     import electron from 'electron'
 
+    const windowManager = electron.remote.require('electron-window-manager')
+
     export default {
         data() {
             return {
@@ -70,11 +72,12 @@
         },
         mounted() {
             let _this = this
-            Config.read((conf) => {
+            Config.read().then((conf) => {
                 _this.setting = conf
                 _this.$watch('setting.hotkey.toggleMain', {
                     deep: true,
                     handler: function () {
+                        console.log('-----------------')
                         let windowObj = electron.remote.getCurrentWindow().getParentWindow()
                         Shortcut.registShortCut(windowObj,
                             'toggleMain', _this.setting)
@@ -88,9 +91,8 @@
                 _this.$watch('setting.hotkey.toggleQuickrun', {
                     deep: true,
                     handler: function () {
-                        console.log('quickrun window id', _this.Constants.ID.QUICKRUN)
-                        let windowObj = electron.remote.BrowserWindow.fromId(_this.Constants.ID.QUICKRUN)
-                        console.log('all windows', electron.remote.BrowserWindow.getAllWindows())
+                        console.log('============')
+                        let windowObj = windowManager.get(_this.Constants.NAME.QUICKRUN).object
                         console.log('quickru window', windowObj)
                         Shortcut.registShortCut(windowObj,
                             'toggleQuickrun', _this.setting)
@@ -101,6 +103,8 @@
                             })
                     }
                 })
+            }).catch(err => {
+                console.error(err)
             })
         },
         methods: {}

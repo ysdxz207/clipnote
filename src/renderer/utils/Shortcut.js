@@ -7,7 +7,7 @@ let shortcut = {}
 shortcut.registShortCut = function(windowObj, key, conf) {
     let error = {}
     return new Promise(function(resolve, reject) {
-        Config.read((confOld) => {
+        Config.read().then((confOld) => {
             if (!conf || !conf.hotkey) {
                 conf = confOld
             }
@@ -57,6 +57,8 @@ shortcut.registShortCut = function(windowObj, key, conf) {
                 console.log('Shortcut registration sucess!')
                 resolve()
             }
+        }).catch(err => {
+            console.error(err)
         })
     })
 }
