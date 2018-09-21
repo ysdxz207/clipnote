@@ -172,9 +172,12 @@
             },
             favouriteNote(note) {
                 let _this = this
-                let noteTemp = JSON.parse(JSON.stringify(note))
-                note.favourite = !noteTemp.favourite
-                _this.$db.update(noteTemp, note, (err, numReplaced) => {
+                let noteOld = JSON.parse(JSON.stringify(note))
+                let noteNew = JSON.parse(JSON.stringify(note))
+                noteNew.favourite = !noteOld.favourite
+                console.log(noteNew, noteOld)
+                _this.$db.update(noteOld, noteNew, (err, numReplaced) => {
+                    console.log(numReplaced)
                     if (err) {
                         _this.$message({
                             type: 'error',

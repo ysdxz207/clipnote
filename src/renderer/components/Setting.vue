@@ -22,7 +22,7 @@
             </el-form>
 
         </el-col>
-        <el-col :span="12">
+        <el-col :span="11">
             <el-form label-width="80px">
                 <el-form-item label="quickrun:">
                     <el-row type="flex" justify="space-between">
