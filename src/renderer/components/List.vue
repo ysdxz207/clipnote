@@ -3,15 +3,20 @@
         <ul v-if="itemList.length > 0">
             <li v-for="(item, index) in itemList"
                 :key="index">
-                <span class="item-title-group" @click="editNote(item._id)">
-                    <span class="item-title">{{item.title}}</span>
+                <span class="item-title-group" title="点击编辑笔记" @click="editNote(item._id)">
+                    <span class="item-title">{{item.title.length > 20 ? (item.title.substring(0, 20) + '...') : item.title}}</span>
                 </span>
                 <span class="item-btn-group">
-                    <span class="btn-favourite" @click="favouriteNote(item)">
+                    <span class="btn-favourite" title="复制标题" v-if="item.type === 'note' && item.categoryId !== clipboardId && item.categoryId !== recycleId" @click="copyNoteTitle(item.title)">
+                        <svg class="icon" aria-hidden="true">
+                            <use xlink:href="#clipnote-icon-copy"></use>
+                        </svg>
+                    </span>
+                    <span class="btn-favourite" title="添加/取消收藏" @click="favouriteNote(item)">
                         <i class="element-icons clipnote-icon-favourite"
                            :style="item.favourite ? 'color: yellow' : 'color: grey'"></i>
                     </span>
-                    <span class="btn-del" @click="deleteNote(item)">
+                    <span class="btn-del" title="删除笔记" @click="deleteNote(item)">
                         <svg class="icon" aria-hidden="true">
                             <use xlink:href="#clipnote-icon-delete"></use>
                         </svg>
@@ -33,10 +38,12 @@
 </template>
 
 <script>
+    import Clipboard from '../utils/Clipboard'
     export default {
         data() {
             return {
                 recycleId: 'recycle',
+                clipboardId: 'clipboard',
                 categoryId: this.$route.query.categoryId,
                 type: this.$route.query.type,
                 itemList: []
@@ -176,6 +183,11 @@
                     } else {
                         _this.loadItemList()
                     }
+                })
+            },
+            copyNoteTitle(title) {
+                Clipboard.copyToClipboard(title).then(() => {
+                    this.$message.success('已复制标题')
                 })
             }
         }

@@ -5,6 +5,7 @@ const db = Config.$db
 const clipboard = require('electron-clipboard-extended')
 
 const clip = {}
+let copyAction = false
 
 clip.watchOrUnWatch = function (callback) {
     Config.read().then((config) => {
@@ -16,6 +17,10 @@ clip.watchOrUnWatch = function (callback) {
         }
         clipboard
             .on('text-changed', () => {
+                if (copyAction) {
+                    copyAction = false
+                    return
+                }
                 let currentText = clipboard.readText()
                 if (currentText.replace(/\s+/g, '').replace(/[\r\n]/g, '').length === 0) {
                     return
@@ -39,6 +44,18 @@ clip.watchOrUnWatch = function (callback) {
             .startWatching()
     }).catch(err => {
         console.error(err)
+    })
+}
+
+clip.copyToClipboard = function (text) {
+    return new Promise((resolve, reject) => {
+        copyAction = true
+        try {
+            clipboard.writeText(text)
+            resolve()
+        } catch (e) {
+            reject(e)
+        }
     })
 }
 

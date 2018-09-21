@@ -21,6 +21,7 @@
 </template>
 
 <script>
+    import Clipboard from '../utils/Clipboard'
     export default {
         data() {
             return {
@@ -104,7 +105,9 @@
                 _this.$router.push({name: 'list', query: {type: _this.note.type, categoryId: _this.note.categoryId}})
             },
             copyNote() {
-
+                Clipboard.copyToClipboard(this.note.context).then(() => {
+                    this.$message.success('已复制内容')
+                })
             }
         }
     }
