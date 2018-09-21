@@ -45,11 +45,10 @@ config.read = function () {
         config.$db.findOne({
             type: 'config'
         }, (err, doc) => {
-            console.log('read', doc)
             if (err) {
                 reject(err)
             } else {
-                resolve(doc || {})
+                resolve(doc ? JSON.parse(JSON.stringify(doc)) : {})
             }
         })
     })
