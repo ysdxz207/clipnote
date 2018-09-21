@@ -18,6 +18,7 @@
             </el-form-item>
             <el-form-item>
                 <el-button type="success" @click="editShortcut" size="mini">保存</el-button>
+                <el-button type="danger" @click="deleteShortcut" size="mini">删除</el-button>
             </el-form-item>
         </el-form>
     </transition>
@@ -40,6 +41,9 @@
                 this.shortcutTemp = JSON.parse(JSON.stringify(shortcut))
                 this.shortcut = shortcut
             })
+            // ESC
+            document.removeEventListener('keydown', this.onEscKey)
+            document.addEventListener('keydown', this.onEscKey)
         },
         methods: {
             editShortcut() {
@@ -49,6 +53,22 @@
                     target: _this.shortcut
                 })
                 electron.remote.getCurrentWindow().hide()
+            },
+            deleteShortcut() {
+                let _this = this
+                electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+                    type: 'error',
+                    title: '提示',
+                    message: '确定删除此快捷方式吗？',
+                    buttons: ['确定', '取消'],
+                    cancelId: -1,
+                    defaultId: 1
+                }, (index) => {
+                    if (index === 0) {
+                        electron.ipcRenderer.send('shortcutDelete', _this.shortcutTemp)
+                        electron.remote.getCurrentWindow().hide()
+                    }
+                })
             },
             getIcon() {
                 let _this = this
@@ -65,6 +85,11 @@
                         _this.shortcut.icon = base64
                     }
                 })
+            },
+            onEscKey(e) {
+                if (e.which === 27) {
+                    electron.remote.getCurrentWindow().hide()
+                }
             }
         }
     }

@@ -13,7 +13,8 @@
     import fs from 'fs'
     import EIconExtractor from '../../utils/EIconExtractor'
     import Constants from '../../utils/Constants'
-    var windowManager = electron.remote.require('electron-window-manager')
+
+    let windowManager = electron.remote.require('electron-window-manager')
 
     const windowsShortcuts = require('windows-shortcuts')
     const childProcess = require('child_process')
@@ -44,7 +45,10 @@
             document.addEventListener('dragover', function (e) {
                 e.preventDefault()
             })
+            document.removeEventListener('drop', _this.onDropFiles)
             document.addEventListener('drop', _this.onDropFiles)
+            document.removeEventListener('keydown', _this.onKeydown)
+            document.addEventListener('keydown', _this.onKeydown)
 
             // 加载列表
             _this.loadQuickrunList()
@@ -64,6 +68,20 @@
                     }
                 })
             })
+            // 删除快捷方式，放在quickrunEdit里会数据不同步
+            electron.remote.ipcMain.on('shortcutDelete', (event, o) => {
+                console.log('delete:', o)
+                _this.$db.remove({_id: o._id}, {}, (err, numRemoved) => {
+                    if (err) {
+                        _this.$message({
+                            type: 'error',
+                            message: '删除快捷方式失败：' + err
+                        })
+                    } else {
+                        _this.loadQuickrunList()
+                    }
+                })
+            })
         },
         methods: {
             createEditWindow() {
@@ -73,7 +91,7 @@
                     _this.editWindow = editWindow
                     return
                 }
-                editWindow = windowManager.createNew(_this.Constants.NAME, '', Constants.URL.index + '#/quickrun/edit', false, {
+                editWindow = windowManager.createNew(_this.Constants.NAME.QUICKRUN_EDIT, '', Constants.URL.index + '#/quickrun/edit', false, {
                     show: false,
                     frame: false,
                     parent: electron.remote.getCurrentWindow(),
@@ -209,8 +227,70 @@
                 } else if (e.button === 2) {
                     _this.showEditDialog(shortcut)
                 }
-            }
+            },
+            delete(shortcut) {
+                electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+                    type: 'error',
+                    title: '提示',
+                    message: '确定删除此快捷方式吗？',
+                    buttons: ['确定', '取消'],
+                    cancelId: -1,
+                    defaultId: 1
+                }, (index) => {
+                    if (index === 0) {
+                        electron.ipcRenderer.send('shortcutDelete', shortcut)
+                    }
+                })
+            },
+            onKeydown(e) {
+                let _this = this
+                let mainul = document.querySelector('.quickrun-ul')
+                let selected = mainul.querySelector('li.selected')
+                let liList = mainul.querySelectorAll('li')
 
+                let index = selected == null ? -1 : [].indexOf.call(liList, selected)
+
+                switch (e.which) {
+                case 38:
+                    // 屏蔽上向键
+                    e.preventDefault()
+
+                    if (index === 0) {
+                        index = liList.length
+                    }
+                    _this.setSelected(index - 1)
+                    break
+
+                case 40:
+                    // 屏蔽下方向键
+                    e.preventDefault()
+                    if (index === liList.length - 1) {
+                        index = -1
+                    }
+                    _this.setSelected(index + 1)
+                    break
+
+                    // ESC
+                case 27:
+                    _this.setSelected(-1)
+                    break
+                case 13:
+                    // 回车
+                    /* falls through */
+                case 32:
+                    // 空格
+                    e.preventDefault()
+                    if (index > -1 && index < liList.length) {
+                        _this.run(_this.shortcutList[index])
+                    }
+                    break
+                case 46:
+                    // 删除
+                    if (index > -1 && index < liList.length) {
+                        _this.delete(_this.shortcutList[index])
+                    }
+                }
+            }
         }
     }
 </script>
@@ -242,6 +322,10 @@
         text-overflow: ellipsis; /*省略号*/
         font-size: 18px;
         white-space: nowrap; /*强制不换行*/
+    }
+
+    li.selected {
+        background-color: #47e2ff;
     }
 
     li:hover {

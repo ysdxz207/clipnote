@@ -84,7 +84,11 @@
                             .then(() => {
                                 Config.save(_this.setting)
                             }).catch(() => {
-                                _this.$message.error('快捷键可能已被占用')
+                                _this.$message({
+                                    type: 'error',
+                                    message: '快捷键可能已被占用',
+                                    showClose: true
+                                })
                             })
                     }
                 })
