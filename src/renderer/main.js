@@ -8,16 +8,16 @@ import router from './router'
 import store from './store'
 import Constants from './utils/Constants'
 import Directives from './utils/Directives'
+import Config from './utils/Config'
 import '../../static/assets/icons/iconfont.css'
 import '../../static/assets/icons/iconfont.js'
-import electron from 'electron'
 
 Vue.use(ElementUI)
 Vue.use(Directives)
 
 Vue.prototype.bus = new Vue()
 Vue.prototype.Constants = Constants
-Vue.prototype.$db = global.$db || electron.remote.getGlobal('$db')
+Vue.prototype.$db = Config.$db
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios

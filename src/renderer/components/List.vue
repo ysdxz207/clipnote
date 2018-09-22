@@ -39,6 +39,7 @@
 
 <script>
     import Clipboard from '../utils/Clipboard'
+
     export default {
         data() {
             return {
@@ -90,19 +91,27 @@
                         .replace(/\*/g, '\\*')
                     regStr += '(' + o + ')([\\s\\S]*)'
                 })
-                let reg = new RegExp(regStr, 'i')
                 _this.$db.find({
                     type: 'note',
-                    title: {
-                        $regex: reg
+                    $or: [
+                        {
+                            title: {
+                                $regex: new RegExp(regStr, 'i')
+                            }
+                        },
+                        {
+                            context: {
+                                $regex: new RegExp(regStr, 'i')
+                            }
+                        }
+                    ]
+                }).sort({time: -1}).exec((err, docs) => {
+                    if (!err) {
+                        _this.itemList = JSON.parse(JSON.stringify(docs))
+                    } else {
+                        console.error(err)
                     }
                 })
-                    .sort({time: -1})
-                    .exec((err, docs) => {
-                        if (!err) {
-                            _this.itemList = docs
-                        }
-                    })
             },
             loadItemList() {
                 let _this = this
@@ -124,7 +133,7 @@
                                 message: '笔记列表加载失败：' + err
                             })
                         } else {
-                            _this.itemList = docs
+                            _this.itemList = JSON.parse(JSON.stringify(docs))
                         }
                     })
             },

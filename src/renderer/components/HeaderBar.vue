@@ -14,7 +14,7 @@
                     <input type="text"
                            v-model="keywords"
                            placeholder="搜索"
-                           class="input-search" @keyup="search"/>
+                           class="input-search"/>
                 </label>
             </el-col>
         </el-col>
@@ -26,6 +26,11 @@
         data() {
             return {
                 keywords: ''
+            }
+        },
+        watch: {
+            'keywords': function(newVal, oldVal) {
+                this.search()
             }
         },
         methods: {

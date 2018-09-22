@@ -28,7 +28,7 @@ const settingURL = winURL + '#/setting'
 const quickrunURL = winURL + '#/quickrun'
 
 // 开机启动
-var clipnoteAutoLauncher = new AutoLaunch({
+let clipnoteAutoLauncher = new AutoLaunch({
     name: app.getName(),
     path: process.cwd() + path.sep + app.getName() + '.exe'
 })
@@ -179,6 +179,18 @@ function toggleStartUp(startup) {
     } else {
         clipnoteAutoLauncher.disable()
     }
+}
+// 单开程序
+const shouldQuit = app.makeSingleInstance((commandLine, workingDirectory) => {
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+        if (!mainWindow.isVisible()) mainWindow.show()
+        mainWindow.focus()
+    }
+})
+
+if (shouldQuit) {
+    app.quit()
 }
 
 app.on('ready', init)
