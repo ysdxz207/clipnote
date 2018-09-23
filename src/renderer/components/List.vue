@@ -1,7 +1,7 @@
 <template>
     <div class="list">
-        <ul v-if="itemList.length > 0">
-            <li v-for="(item, index) in itemList"
+        <ul v-if="results.length > 0">
+            <li v-for="(item, index) in results"
                 :key="index">
                 <span class="item-title-group" title="点击编辑笔记" @click="editNote(item.id)">
                     <span class="item-title">{{item.title.length > 20 ? (item.title.substring(0, 20) + '...') : item.title}}</span>
@@ -39,12 +39,13 @@
 
 <script>
     import Clipboard from '../utils/Clipboard'
-
     export default {
         data() {
             return {
                 categoryId: this.$route.query.categoryId || this.Constants.ID.defaultCategoryId,
-                itemList: []
+                itemList: [],
+                results: [],
+                keys: ['title', 'context']
             }
         },
         watch: {
@@ -59,6 +60,9 @@
             _this.bus.$on('search', function (keywords) {
                 _this.triggerSearch(keywords)
             })
+            this.$on('results', results => {
+                this.results = results
+            })
         },
         mounted() {
             let _this = this
@@ -67,28 +71,22 @@
         methods: {
             triggerSearch(keywords) {
                 let _this = this
-                let keywordArr = keywords.split(' ')
-                let regStr = ''
-                keywordArr.forEach((o, index) => {
-                    o = o.replace(/\\/g, '\\\\')
-                        .replace(/\//g, '\\/')
-                        .replace(/\|/g, '\\|')
-                        .replace(/\{/g, '\\{')
-                        .replace(/\}/g, '\\}')
-                        .replace(/\(/g, '\\(')
-                        .replace(/\)/g, '\\)')
-                        .replace(/\[/g, '\\[')
-                        .replace(/\]/g, '\\]')
-                        .replace(/\^/g, '\\^')
-                        .replace(/\$/g, '\\$')
-                        .replace(/\+/g, '\\+')
-                        .replace(/\?/g, '\\?')
-                        .replace(/\./g, '\\.')
-                        .replace(/\*/g, '\\*')
-                    regStr += '(' + o + ')([\\s\\S]*)'
+                _this.itemList = _this.$db.get('notes').sortBy('time').value().reverse()
+                const str = keywords.toLowerCase()
+                if (!str) {
+                    _this.results = _this.itemList
+                    return
+                }
+
+                _this.results = _this.itemList.filter(item => {
+                    let pos = 0
+                    let target = item.title + ' ' + item.context
+                    return [...str].every(s => {
+                        target = target.substr(pos)
+                        pos = target.indexOf(s) + 1
+                        return pos > 0
+                    })
                 })
-                console.log(regStr)
-                _this.itemList = _this.$db.get('notes').sortBy('time').value()
             },
             loadItemList() {
                 let _this = this
@@ -101,6 +99,7 @@
                 }
                 _this.itemList = _this.$db.get('notes').filter(searchInfo)
                     .sortBy('time').cloneDeep().value().reverse()
+                _this.results = _this.itemList
             },
             editNote(id) {
                 this.$router.push({name: 'edit', query: {id: id, categoryId: this.categoryId}})
