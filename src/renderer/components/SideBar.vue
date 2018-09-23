@@ -1,22 +1,22 @@
 <template>
     <div class="sidebar">
         <div>
-            <div class="item" :class="activeSidebar === recycleId ? 'active' : ''"
-                 @click="showItemList(recycleId, 'note')">
+            <div class="item" :class="activeSidebar === Constants.ID.recycleId ? 'active' : ''"
+                 @click="showItemList(Constants.ID.recycleId)">
                 <svg class="icon" aria-hidden="true">
                     <use xlink:href="#clipnote-icon-recycle"></use>
                 </svg>
                 <span class="title">回收站</span>
             </div>
-            <div class="item" :class="activeSidebar === favouritesId ? 'active' : ''"
-                 @click="showItemList(favouritesId, 'note')">
+            <div class="item" :class="activeSidebar === Constants.ID.favouriteId ? 'active' : ''"
+                 @click="showItemList(Constants.ID.favouriteId)">
                 <svg class="icon" aria-hidden="true">
                     <use xlink:href="#clipnote-icon-favourite"></use>
                 </svg>
                 <span class="title">收藏夹</span>
             </div>
-            <div class="item" :class="activeSidebar === clipboardId ? 'active' : ''">
-                <el-col :span="12" @click.native="showItemList(clipboardId, 'note')">
+            <div class="item" :class="activeSidebar === Constants.ID.clipboardId ? 'active' : ''">
+                <el-col :span="12" @click.native="showItemList(Constants.ID.clipboardId)">
                     <svg class="icon" aria-hidden="true">
                         <use xlink:href="#clipnote-icon-clipboard"></use>
                     </svg>
@@ -50,11 +50,11 @@
                               tag="ul">
                 <li v-for="(o, index) in categoryList"
                     :key="index"
-                    :class="o._id === activeSidebar ? 'active' : ''">
-                    <span class="name" @click="showItemList(o._id, 'note')">{{o.name}}</span>
+                    :class="(o.id === activeSidebar) ? 'active' : ''">
+                    <span class="name" @click="showItemList(o.id)">{{o.name}}</span>
                     <span class="btn-delete"
-                          @click="deleteCategory(o._id)"
-                          v-if="o._id !== defaultCategoryId">
+                          @click="deleteCategory(o.id)"
+                          v-if="o.id !== Constants.ID.defaultCategoryId">
                         <svg class="icon" aria-hidden="true">
                             <use xlink:href="#clipnote-icon-delete1"></use>
                         </svg>
@@ -66,27 +66,18 @@
 </template>
 
 <script>
-    import Config from '../utils/Config'
-
     export default {
         components: {},
         data() {
             return {
-                defaultCategoryId: '0000000000_default_category',
-                recycleId: 'recycle',
-                favouritesId: 'favourites',
-                clipboardId: 'clipboard',
-                activeSidebar: '',
+                activeSidebar: this.Constants.ID.defaultCategoryId,
                 categoryList: [],
                 conf: {}
             }
         },
         watch: {
             '$route'(to, from) {
-                let categoryId = this.$route.query.categoryId
-                if (categoryId) {
-                    this.activeSidebar = categoryId
-                }
+                this.activeSidebar = this.$route.query.categoryId
             }
 
         },
@@ -94,74 +85,18 @@
         },
         mounted() {
             let _this = this
-            // 初始化[全部]分类
-            _this.initDefaultCategory()
-            _this.loadCategoryList((categoryList) => {
-                // 默认打开第一个分类下列表
-                if (categoryList[0]) {
-                    _this.showItemList(categoryList[0]._id, 'note')
-                }
-            })
+            _this.loadCategoryList()
+            // 选中并加载全部笔记分类
+            _this.showItemList(_this.Constants.ID.defaultCategoryId)
             // 选中第一个分类
             _this.activeSidebar = _this.$route.query.categoryId
             // 是否开启剪贴板收集功能
             setTimeout(_this.loadClipboardCollection(), 2000)
         },
         methods: {
-            initDefaultCategory() {
+            loadCategoryList() {
                 let _this = this
-                let defaultCategory = {
-                    type: 'category',
-                    _id: _this.defaultCategoryId,
-                    time: 999999999999999
-                }
-                _this.$db.find(defaultCategory, (err, docs) => {
-                    if (err) {
-                        _this.$message({
-                            type: 'error',
-                            message: '默认分类初始化失败(查询)：' + err
-                        })
-                    } else {
-                        if (!docs || docs.length === 0) {
-                            defaultCategory.name = '全部笔记'
-                            _this.$db.insert(defaultCategory, (err, newDoc) => {
-                                if (err) {
-                                    _this.$message({
-                                        type: 'error',
-                                        message: '默认分类初始化失败：' + err
-                                    })
-                                } else {
-                                    _this.loadCategoryList((categoryList) => {
-                                        // 默认打开第一个分类下列表
-                                        if (categoryList[0]) {
-                                            _this.showItemList(categoryList[0]._id, 'note')
-                                        }
-                                    })
-                                }
-                            })
-                        }
-                    }
-                })
-            },
-            loadCategoryList(callback) {
-                let _this = this
-                _this.$db.find({
-                    type: 'category'
-                }).sort({
-                    time: -1
-                }).exec((err, docs) => {
-                    if (err) {
-                        _this.$message({
-                            type: 'error',
-                            message: '分类加载失败：' + err
-                        })
-                    } else {
-                        _this.categoryList = docs
-                        if (callback) {
-                            callback(_this.categoryList)
-                        }
-                    }
-                })
+                _this.categoryList = _this.$db.get('categories').sortBy('time').value().reverse()
             },
             newCategory() {
                 let _this = this
@@ -184,31 +119,17 @@
                         return
                     }
                     let doc = {
-                        type: 'category',
                         name: value,
                         time: new Date().getTime()
                     }
-                    _this.$db.insert(doc, (err, newDoc) => {
-                        if (err) {
-                            _this.$message({
-                                type: 'error',
-                                message: '添加分类失败：' + err
-                            })
-                        } else {
-                            _this.loadCategoryList()
-                            // 新增分类成功跳转到当前分类列表
-                            _this.$router.push({name: 'list', query: {categoryId: newDoc._id, type: 'note'}})
-                            // _this.$message({
-                            //     type: 'success',
-                            //     message: '添加成功'
-                            // })
-                        }
-                    })
-                }).catch(() => {
+                    let newDoc = _this.$db.get('categories').insert(doc).write()
+                    _this.loadCategoryList()
+                    // 新增分类成功跳转到当前分类列表
+                    _this.$router.push({name: 'list', query: {categoryId: newDoc.id}})
                 })
             },
-            showItemList(_id, type) {
-                this.$router.push({name: 'list', query: {categoryId: _id, type: type}})
+            showItemList(categoryId) {
+                this.$router.push({name: 'list', query: {categoryId: categoryId}})
             },
             deleteCategory(id) {
                 let _this = this
@@ -217,71 +138,38 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    _this.$db.remove({_id: id}, {}, (err, numRemoved) => {
-                        if (err) {
-                            _this.$message({
-                                type: 'error',
-                                message: '删除分类失败：' + err
-                            })
-                        } else {
-                            _this.loadCategoryList((categoryList) => {
-                                // 转移当前分类下内容到回收站
-                                _this.$db.find({
-                                    categoryId: id,
-                                    type: 'note'
-                                }, (err, docs) => {
-                                    if (err) {
-                                        _this.$message({
-                                            type: 'error',
-                                            message: '转移分类下笔记失败(查询)：' + err
-                                        })
-                                    } else {
-                                        docs.forEach((o, index) => {
-                                            let oTemp = JSON.parse(JSON.stringify(o))
-                                            o.categoryId = _this.recycleId
-                                            _this.$db.update(oTemp, o, {}, (err, numReplaced) => {
-                                                if (err) {
-                                                    _this.$message({
-                                                        type: 'error',
-                                                        message: '转移分类下笔记失败：' + err
-                                                    })
-                                                }
-                                            })
-                                        })
-                                        // 删除分类完成回到默认分类下
-                                        _this.$router.push({
-                                            name: 'list',
-                                            query: {categoryId: _this.defaultCategoryId, type: 'note'}
-                                        })
-                                    }
-                                })
-                            })
-                            // _this.$message({
-                            //     type: 'success',
-                            //     message: '删除成功'
-                            // })
-                        }
+                    // 删除分类
+                    _this.$db.get('categories').remove({id: id}).write()
+                    // 重新加载分类列表
+                    _this.loadCategoryList()
+                    // 转移当前分类下内容到回收站
+                    let noteList = _this.$db.get('notes').filter({
+                        categoryId: id
+                    }).value()
+                    noteList.forEach((o, index) => {
+                        o.categoryId = _this.Constants.ID.recycleId
+                        _this.$db.get('categories').find({id: o.id}).assign(o).write()
+                    })
+                    // 删除分类完成回到默认分类下
+                    _this.$router.push({
+                        name: 'list',
+                        query: {categoryId: _this.Constants.ID.defaultCategoryId}
                     })
                 }).catch(() => {
                 })
             },
             loadClipboardCollection() {
                 let _this = this
-                Config.read().then((config) => {
-                    _this.conf = config
-                    _this.$watch('conf.clipboardCollection', {
-                        deep: true,
-                        handler: function () {
-                            console.log('change clipboardCollection')
-                            Config.save(_this.conf).then(() => {
-                                _this.bus.$emit('configChange', 'clipboardCollection')
-                            }).catch(err => {
-                                console.error(err)
-                            })
-                        }
-                    })
-                }).catch(err => {
-                    console.error(err)
+                _this.conf = _this.$db.get('config').value()
+                _this.$watch('conf.clipboardCollection', {
+                    deep: true,
+                    handler: function () {
+                        console.log('change clipboardCollection')
+                        _this.$db.update('config', (o) => {
+                            return _this.conf
+                        }).write()
+                        _this.bus.$emit('configChange', 'clipboardCollection')
+                    }
                 })
             }
         }

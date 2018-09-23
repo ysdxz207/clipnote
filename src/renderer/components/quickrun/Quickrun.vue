@@ -23,7 +23,6 @@
     export default {
         data() {
             return {
-                type: 'shortcut',
                 shortcutList: [],
                 editWindow: null
             }
@@ -57,30 +56,16 @@
             // 修改快捷方式，放在quickrunEdit里会数据不同步
             electron.remote.ipcMain.on('shortcutEdit', (event, o) => {
                 console.log('edit:', o)
-                _this.$db.update(o.source, o.target, {}, (err, num) => {
-                    if (err) {
-                        _this.$message({
-                            type: 'error',
-                            message: '修改快捷方式失败：' + err
-                        })
-                    } else {
-                        _this.loadQuickrunList()
-                    }
-                })
+                _this.$db.get('shortcuts').find({
+                    id: o.id
+                }).assign().write()
+                _this.loadQuickrunList()
             })
             // 删除快捷方式，放在quickrunEdit里会数据不同步
             electron.remote.ipcMain.on('shortcutDelete', (event, o) => {
                 console.log('delete:', o)
-                _this.$db.remove({_id: o._id}, {}, (err, numRemoved) => {
-                    if (err) {
-                        _this.$message({
-                            type: 'error',
-                            message: '删除快捷方式失败：' + err
-                        })
-                    } else {
-                        _this.loadQuickrunList()
-                    }
-                })
+                _this.$db.get('shortcuts').remove({id: o.id}).write()
+                _this.loadQuickrunList()
             })
         },
         methods: {
@@ -109,19 +94,7 @@
             },
             loadQuickrunList() {
                 let _this = this
-                _this.$db.find({
-                    type: _this.type
-                }).sort({
-                    id: -1
-                }).exec((err, docs) => {
-                    if (!err) {
-                        // _this.shortcutList = []
-                        _this.shortcutList = JSON.parse(JSON.stringify(docs))
-                        console.log(_this.shortcutList)
-                    } else {
-                        console.error(err)
-                    }
-                })
+                _this.shortcutList = _this.$db.get('shortcuts').sortBy('time').value()
             },
             checkEShortcutExists(name) {
                 console.log('是否存在', name)
@@ -194,12 +167,8 @@
                             }
 
                             // 保存数据库
-                            _this.$db.insert(eshortcut, (err, newDoc) => {
-                                if (!err) {
-                                    _this.loadQuickrunList()
-                                    console.log(newDoc)
-                                }
-                            })
+                            _this.$db.get('shortcuts').insert(eshortcut).write()
+                            _this.loadQuickrunList()
                         })
                     })
                 }

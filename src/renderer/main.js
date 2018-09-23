@@ -8,16 +8,16 @@ import router from './router'
 import store from './store'
 import Constants from './utils/Constants'
 import Directives from './utils/Directives'
-import Config from './utils/Config'
 import '../../static/assets/icons/iconfont.css'
 import '../../static/assets/icons/iconfont.js'
+import $db from '../renderer/utils/db'
 
 Vue.use(ElementUI)
 Vue.use(Directives)
 
 Vue.prototype.bus = new Vue()
 Vue.prototype.Constants = Constants
-Vue.prototype.$db = Config.$db
+Vue.prototype.$db = $db
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios

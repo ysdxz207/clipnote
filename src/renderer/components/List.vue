@@ -3,16 +3,16 @@
         <ul v-if="itemList.length > 0">
             <li v-for="(item, index) in itemList"
                 :key="index">
-                <span class="item-title-group" title="点击编辑笔记" @click="editNote(item._id)">
+                <span class="item-title-group" title="点击编辑笔记" @click="editNote(item.id)">
                     <span class="item-title">{{item.title.length > 20 ? (item.title.substring(0, 20) + '...') : item.title}}</span>
                 </span>
                 <span class="item-btn-group">
-                    <span class="btn-favourite" title="复制标题" v-if="item.type === 'note' && item.categoryId !== clipboardId && item.categoryId !== recycleId" @click="copyNoteTitle(item.title)">
+                    <span class="btn-favourite" title="复制标题" @click="copyNoteTitle(item.title)">
                         <svg class="icon" aria-hidden="true">
                             <use xlink:href="#clipnote-icon-copy"></use>
                         </svg>
                     </span>
-                    <span class="btn-favourite" title="添加/取消收藏" @click="favouriteNote(item)">
+                    <span class="btn-favourite" v-if="item.categoryId !== Constants.ID.recycleId" title="添加/取消收藏" @click="favouriteNote(item)">
                         <i class="element-icons clipnote-icon-favourite"
                            :style="item.favourite ? 'color: yellow' : 'color: grey'"></i>
                     </span>
@@ -33,7 +33,7 @@
                    circle
                    @click.native="editNote()"
                    title="写笔记"
-                   v-if="$route.query.categoryId !== '0000000000_default_category'"></el-button>
+                   v-if="$route.query.categoryId !== Constants.ID.defaultCategoryId"></el-button>
     </div>
 </template>
 
@@ -43,17 +43,13 @@
     export default {
         data() {
             return {
-                recycleId: 'recycle',
-                clipboardId: 'clipboard',
-                categoryId: this.$route.query.categoryId,
-                type: this.$route.query.type,
+                categoryId: this.$route.query.categoryId || this.Constants.ID.defaultCategoryId,
                 itemList: []
             }
         },
         watch: {
             '$route'(to, from) {
-                this.categoryId = this.$route.query.categoryId
-                this.type = this.$route.query.type
+                this.categoryId = this.$route.query.categoryId || this.Constants.ID.defaultCategoryId
                 this.loadItemList()
             }
 
@@ -91,111 +87,48 @@
                         .replace(/\*/g, '\\*')
                     regStr += '(' + o + ')([\\s\\S]*)'
                 })
-                _this.$db.find({
-                    type: 'note',
-                    $or: [
-                        {
-                            title: {
-                                $regex: new RegExp(regStr, 'i')
-                            }
-                        },
-                        {
-                            context: {
-                                $regex: new RegExp(regStr, 'i')
-                            }
-                        }
-                    ]
-                }).sort({time: -1}).exec((err, docs) => {
-                    if (!err) {
-                        _this.itemList = JSON.parse(JSON.stringify(docs))
-                    } else {
-                        console.error(err)
-                    }
-                })
+                console.log(regStr)
+                _this.itemList = _this.$db.get('notes').sortBy('time').value()
             },
             loadItemList() {
                 let _this = this
-                let searchInfo = {
-                    type: _this.type
-                }
-                if (_this.categoryId === 'favourites') {
+                let searchInfo = {}
+                if (_this.categoryId === _this.Constants.ID.favouriteId) {
                     searchInfo.favourite = true
-                } else if (_this.categoryId === '0000000000_default_category') {
+                } else if (_this.categoryId === _this.Constants.ID.defaultCategoryId) {
                 } else {
                     searchInfo.categoryId = _this.categoryId
                 }
-                _this.$db.find(searchInfo)
-                    .sort({time: -1})
-                    .exec((err, docs) => {
-                        if (err) {
-                            _this.$message({
-                                type: 'error',
-                                message: '笔记列表加载失败：' + err
-                            })
-                        } else {
-                            _this.itemList = JSON.parse(JSON.stringify(docs))
-                        }
-                    })
+                _this.itemList = _this.$db.get('notes').filter(searchInfo)
+                    .sortBy('time').cloneDeep().value().reverse()
             },
             editNote(id) {
                 this.$router.push({name: 'edit', query: {id: id, categoryId: this.categoryId}})
             },
             deleteNote(note) {
                 let _this = this
-                let recycle = note.categoryId === _this.recycleId
+                let recycle = note.categoryId === _this.Constants.ID.recycleId
                 let info = (recycle ? '删除后将无法恢复，' : '') + '确定删除此笔记吗？'
                 _this.$confirm(info, '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    _this.$db.remove({_id: note._id}, {}, (err, numRemoved) => {
-                        if (err) {
-                            _this.$message({
-                                type: 'error',
-                                message: '删除笔记失败：' + err
-                            })
-                        } else {
-                            _this.loadItemList()
-                            if (recycle) {
-                                return
-                            }
-                            // 转移当前分类下内容到回收站
-                            note.categoryId = _this.recycleId
-                            _this.$db.insert(note, (err, newDoc) => {
-                                if (err) {
-                                    _this.$message({
-                                        type: 'error',
-                                        message: '转移分类下笔记失败：' + err
-                                    })
-                                }
-                            })
-                            // _this.$message({
-                            //     type: 'success',
-                            //     message: '删除成功'
-                            // })
-                        }
-                    })
+                    _this.$db.get('notes').remove({id: note.id}).write()
+                    _this.loadItemList()
+                    if (recycle) {
+                        return
+                    }
+                    // 转移当前分类下内容到回收站
+                    note.categoryId = _this.Constants.ID.recycleId
+                    _this.$db.get('notes').insert(note).write()
                 }).catch(() => {
                 })
             },
             favouriteNote(note) {
                 let _this = this
-                let noteOld = JSON.parse(JSON.stringify(note))
-                let noteNew = JSON.parse(JSON.stringify(note))
-                noteNew.favourite = !noteOld.favourite
-                console.log(noteNew, noteOld)
-                _this.$db.update(noteOld, noteNew, (err, numReplaced) => {
-                    console.log(numReplaced)
-                    if (err) {
-                        _this.$message({
-                            type: 'error',
-                            message: '收藏或取消收藏笔记失败：' + err
-                        })
-                    } else {
-                        _this.loadItemList()
-                    }
-                })
+                _this.$db.get('notes').find({id: note.id}).assign({favourite: !note.favourite}).write()
+                _this.loadItemList()
             },
             copyNoteTitle(title) {
                 Clipboard.copyToClipboard(title).then(() => {

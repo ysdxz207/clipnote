@@ -47,7 +47,6 @@
 </template>
 
 <script>
-    import Config from '../utils/Config'
     import Shortcut from '../utils/Shortcut'
     import electron from 'electron'
 
@@ -72,43 +71,35 @@
         },
         mounted() {
             let _this = this
-            Config.read().then((conf) => {
-                _this.setting = conf
-                _this.$watch('setting.hotkey.toggleMain', {
-                    deep: true,
-                    handler: function () {
-                        console.log('-----------------')
-                        let windowObj = electron.remote.getCurrentWindow().getParentWindow()
-                        Shortcut.registShortCut(windowObj,
-                            'toggleMain', _this.setting)
-                            .then(() => {
-                                Config.save(_this.setting)
-                            }).catch(() => {
-                                _this.$message({
-                                    type: 'error',
-                                    message: '快捷键可能已被占用',
-                                    showClose: true
-                                })
-                            })
+            _this.setting = _this.$db.get('config').cloneDeep().value()
+            _this.$watch('setting.hotkey.toggleMain', {
+                deep: true,
+                handler: function () {
+                    console.log('-----------------')
+                    let windowObj = electron.remote.getCurrentWindow().getParentWindow()
+                    if (Shortcut.registShortCut(windowObj,
+                        'toggleMain', _this.setting)) {
+                    } else {
+                        _this.$message({
+                            type: 'error',
+                            message: '快捷键可能已被占用',
+                            showClose: true
+                        })
                     }
-                })
-                _this.$watch('setting.hotkey.toggleQuickrun', {
-                    deep: true,
-                    handler: function () {
-                        console.log('============')
-                        let windowObj = windowManager.get(_this.Constants.NAME.QUICKRUN).object
-                        console.log('quickru window', windowObj)
-                        Shortcut.registShortCut(windowObj,
-                            'toggleQuickrun', _this.setting)
-                            .then(() => {
-                                Config.save(_this.setting)
-                            }).catch(() => {
-                                _this.$message.error('快捷键可能已被占用')
-                            })
+                }
+            })
+            _this.$watch('setting.hotkey.toggleQuickrun', {
+                deep: true,
+                handler: function () {
+                    console.log('============')
+                    let windowObj = windowManager.get(_this.Constants.NAME.QUICKRUN).object
+                    console.log('quickru window', windowObj)
+                    if (Shortcut.registShortCut(windowObj,
+                        'toggleQuickrun', _this.setting)) {
+                    } else {
+                        _this.$message.error('快捷键可能已被占用')
                     }
-                })
-            }).catch(err => {
-                console.error(err)
+                }
             })
         },
         methods: {}

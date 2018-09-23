@@ -12,7 +12,14 @@ const NAME = {
     QUICKRUN_EDIT: 'quickrun_edit'
 }
 
+const ID = {
+    defaultCategoryId: 'default_category_id',
+    favouriteId: 'favourite_id',
+    clipboardId: 'clipboard_id',
+    recycleId: 'recycle_id'
+}
 export default {
     URL,
-    NAME
+    NAME,
+    ID
 }

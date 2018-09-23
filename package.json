@@ -64,11 +64,12 @@
     "vuex": "^3.0.1",
     "element-ui": "^2.4.6",
     "vue2-animate": "^2.1.0",
-    "nedb": "^1.8.0",
+    "lowdb": "^1.0.0",
     "electron-clipboard-extended": "^1.1.1",
     "auto-launch": "^5.0.5",
     "windows-shortcuts": "^0.1.6",
-    "electron-window-manager": "^1.0.6"
+    "electron-window-manager": "^1.0.6",
+    "lodash-id": "^0.14.0"
   },
   "devDependencies": {
     "ajv": "^6.5.0",
