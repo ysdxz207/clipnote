@@ -1,7 +1,5 @@
 import electron from 'electron'
-const Datastore = require('nedb')
 const path = require('path')
-
 const config = {}
 
 config.default = {
@@ -67,21 +65,22 @@ config.save = function (conf) {
     })
 }
 
-let init = function() {
+let init = function () {
     if (electron.remote) {
         config.$db = electron.remote.getGlobal('$db')
-        return
-    }
-    const userDataPath = electron.app.getPath('home')
-    const DB_DIR = path.join(userDataPath, 'clipnote')
-    const DB_PATH = path.join(DB_DIR, 'clipnote.nedb')
-    let db = new Datastore({
-        autoload: true,
-        filename: DB_PATH
-    })
-    config.$db = db
-    global.$db = db
-}
+    } else {
+        const Datastore = require('nedb')
+        const userDataPath = electron.app.getPath('home')
+        const DB_DIR = path.join(userDataPath, 'clipnote')
+        const DB_PATH = path.join(DB_DIR, 'clipnote.nedb')
+        let $db = new Datastore({
+            autoload: true,
+            filename: DB_PATH
+        })
 
+        global.$db = $db
+        config.$db = global.$db
+    }
+}
 init()
 export default config
