@@ -70,6 +70,7 @@
         data() {
             return {
                 categoryId: this.$route.query.categoryId || this.Constants.ID.defaultCategoryId,
+                state: this.$route.query.state || this.Constants.STATE.available,
                 itemList: [],
                 results: [],
                 pageSize: 20,
@@ -129,34 +130,32 @@
         methods: {
             loadItemList() {
                 let _this = this
+                console.log(_this.categoryId, _this.state)
                 // 重置选中
                 _this.checkedNotes = []
                 let start = _this.pageSize * (_this.pageCurrent - 1)
                 let end = _this.pageSize * _this.pageCurrent
-                let searchInfo = {
-                    recycle: false
-                }
                 if (_this.keywords) {
-                    let results = _this.seacher.search(_this.keywords)
+                    let results = _this.seacher.search(_this.keywords).filter(o => {
+                        if (_this.state === _this.Constants.STATE.available) {
+                            return o.categoryId === _this.categoryId && _this.state === _this.Constants.STATE.available
+                        } else {
+                            return o.state === _this.state
+                        }
+                    })
                     _this.pageCount = results.length
                     _this.results = results.slice(start, end)
                 } else {
-                    switch (_this.categoryId) {
-                    case _this.Constants.ID.favouriteId:
-                        searchInfo.favourite = true
-                        break
-                    case _this.Constants.ID.recycleId:
-                        searchInfo.recycle = true
-                        break
-                    case _this.Constants.ID.defaultCategoryId:
-                        break
-                    default:
-                        searchInfo.categoryId = _this.categoryId
+                    let queryInfo = {}
+                    if (_this.state === _this.Constants.STATE.available &&
+                        _this.categoryId !== _this.Constants.ID.defaultCategoryId) {
+                        queryInfo.categoryId = _this.categoryId
                     }
-
+                    queryInfo.state = _this.state
                     let collections = _this.$db.get('notes')
                     _this.itemList = collections.value()
-                    collections = collections.filter(searchInfo)
+                    console.log(queryInfo)
+                    collections = collections.filter(queryInfo)
                     _this.pageCount = collections.size().value()
                     _this.results = collections.sortBy('time').slice(start, end).cloneDeep().value().reverse()
                 }
@@ -177,7 +176,7 @@
                         _this.$db.get('notes').remove({id: note.id}).write()
                     } else {
                         // 转移当前分类下内容到回收站
-                        note.recycle = true
+                        _this.note.state = _this.Constants.STATE.recycle
                         _this.$db.get('notes').find({id: note.id}).assign(note).write()
                     }
                     _this.loadItemList()
@@ -186,7 +185,8 @@
             },
             favouriteNote(note) {
                 let _this = this
-                _this.$db.get('notes').find({id: note.id}).assign({favourite: !note.favourite}).write()
+                let state = note.state === _this.Constants.STATE.favourite ? _this.Constants.STATE.available : _this.Constants.STATE.favourite
+                _this.$db.get('notes').find({id: note.id}).assign({state: state}).write()
                 _this.loadItemList()
             },
             copyNoteTitle(title) {
@@ -215,7 +215,7 @@
                         } else {
                             // 转移当前分类下内容到回收站
                             let note = collections.find({id: id}).value()
-                            note.recycle = true
+                            _this.note.state = _this.Constants.STATE.recycle
                             collections.assign(note).write()
                         }
                         _this.loadItemList()
@@ -224,8 +224,7 @@
                 })
             },
             selectAll() {
-                this.checkedNotes = this.results.filter((o) => o.id)
-                console.log(this.checkedNotes)
+                this.checkedNotes = this.results.map((o) => o.id)
             },
             handleCheckedNotesChange(value) {
                 // 勾选后focus

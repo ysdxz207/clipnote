@@ -59,7 +59,7 @@
                         id: _this.note.id
                     }).assign(_this.note).write()
                 } else {
-                    _this.note.recycle = false
+                    _this.note.state = _this.Constants.STATE.available
                     _this.note.time = new Date().getTime()
                     _this.note = _this.$db.get('notes').insert(_this.note).write()
                 }

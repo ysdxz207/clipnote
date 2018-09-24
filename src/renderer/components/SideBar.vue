@@ -1,21 +1,21 @@
 <template>
     <div class="sidebar">
         <div>
-            <div class="item" :class="activeSidebar === Constants.ID.recycleId ? 'active' : ''"
+            <div class="item" :class="activeSidebar === Constants.STATE.recycle ? 'active' : ''"
                  @click="showItemList(Constants.ID.recycleId)">
                 <svg class="icon" aria-hidden="true">
                     <use xlink:href="#clipnote-icon-recycle"></use>
                 </svg>
                 <span class="title">回收站</span>
             </div>
-            <div class="item" :class="activeSidebar === Constants.ID.favouriteId ? 'active' : ''"
+            <div class="item" :class="activeSidebar === Constants.STATE.favourite ? 'active' : ''"
                  @click="showItemList(Constants.ID.favouriteId)">
                 <svg class="icon" aria-hidden="true">
                     <use xlink:href="#clipnote-icon-favourite"></use>
                 </svg>
                 <span class="title">收藏夹</span>
             </div>
-            <div class="item" :class="activeSidebar === Constants.ID.clipboardId ? 'active' : ''">
+            <div class="item" :class="activeSidebar === Constants.STATE.clipboard ? 'active' : ''">
                 <el-col :span="12" @click.native="showItemList(Constants.ID.clipboardId)">
                     <svg class="icon" aria-hidden="true">
                         <use xlink:href="#clipnote-icon-clipboard"></use>
@@ -77,7 +77,12 @@
         },
         watch: {
             '$route'(to, from) {
-                this.activeSidebar = this.$route.query.categoryId
+                let state = this.$route.query.state
+                if (state === this.Constants.STATE.available) {
+                    this.activeSidebar = this.$route.query.categoryId
+                } else {
+                    this.activeSidebar = state
+                }
             }
 
         },
@@ -96,7 +101,7 @@
         methods: {
             loadCategoryList() {
                 let _this = this
-                _this.categoryList = _this.$db.get('categories').sortBy('time').value().reverse()
+                _this.categoryList = _this.$db.get('categories').filter({show: true}).sortBy('time').value().reverse()
             },
             newCategory() {
                 let _this = this
@@ -119,6 +124,7 @@
                         return
                     }
                     let doc = {
+                        show: true,
                         name: value,
                         time: new Date().getTime()
                     }
@@ -128,8 +134,11 @@
                     _this.$router.push({name: 'list', query: {categoryId: newDoc.id}})
                 })
             },
-            showItemList(categoryId) {
-                this.$router.push({name: 'list', query: {categoryId: categoryId}})
+            showItemList(action) {
+                // string为分类，number为状态
+                let categoryId = typeof action === 'number' ? this.Constants.ID.defaultCategoryId : action
+                let state = typeof action === 'string' ? this.Constants.STATE.available : action
+                this.$router.push({name: 'list', query: {categoryId: categoryId, state: state}})
             },
             deleteCategory(id) {
                 let _this = this

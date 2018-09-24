@@ -35,7 +35,6 @@
         },
         methods: {
             search() {
-                this.$router.push({name: 'list', query: {categoryId: this.Constants.ID.defaultCategoryId}})
                 this.bus.$emit('search', this.keywords)
             }
         }

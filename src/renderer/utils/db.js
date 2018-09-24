@@ -24,7 +24,8 @@ db.defaults({
         {
             id: Constants.ID.defaultCategoryId,
             time: 999999999999999,
-            name: '全部笔记'
+            name: '全部笔记',
+            show: true
         }
     ],
     shortcuts: [],

@@ -18,8 +18,16 @@ const ID = {
     clipboardId: 'clipboard_id',
     recycleId: 'recycle_id'
 }
+
+const STATE = {
+    available: 'available',
+    favourite: 'favourite',
+    clipboard: 'clipboard',
+    recycle: 'recycle'
+}
 export default {
     URL,
     NAME,
-    ID
+    ID,
+    STATE
 }
