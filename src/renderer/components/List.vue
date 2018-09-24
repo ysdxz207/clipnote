@@ -1,29 +1,38 @@
 <template>
     <div class="list">
-        <ul v-if="results.length > 0" class="list-ul">
-            <li v-for="(item, index) in results"
-                :key="index">
-                <span class="item-title-group" title="点击编辑笔记" @click="editNote(item.id)">
-                    <span class="item-title">{{item.title.length > 20 ? (item.title.substring(0, 20) + '...') : item.title}}</span>
-                </span>
-                <span class="item-btn-group">
-                    <span class="btn-favourite" title="复制标题" @click="copyNoteTitle(item.title)">
-                        <svg class="icon" aria-hidden="true">
-                            <use xlink:href="#clipnote-icon-copy"></use>
-                        </svg>
+        <el-checkbox-group v-if="results.length > 0" v-model="checkedNotes" @change="handleCheckedNotesChange">
+            <ul class="list-ul">
+                <li v-for="item in results"
+                    :key="item.id">
+                    <span class="item-title-group">
+                        <el-checkbox :label="item.id" :disabled="$route.query.categoryId === Constants.ID.defaultCategoryId">
+                            <span class="item-title">{{item.title.length > 20 ? (item.title.substring(0, 20) + '...') : item.title}}</span>
+                        </el-checkbox>
                     </span>
-                    <span class="btn-favourite" v-if="item.categoryId !== Constants.ID.recycleId" title="添加/取消收藏" @click="favouriteNote(item)">
-                        <i class="element-icons clipnote-icon-favourite"
-                           :style="item.favourite ? 'color: yellow' : 'color: grey'"></i>
+                    <span class="item-btn-group">
+                        <span class="btn-favourite" title="编辑" @click="editNote(item.id)">
+                            <svg class="icon" aria-hidden="true">
+                                <use xlink:href="#clipnote-icon-edit"></use>
+                            </svg>
+                        </span>
+                        <span class="btn-favourite" title="复制标题" @click="copyNoteTitle(item.title)">
+                            <svg class="icon" aria-hidden="true">
+                                <use xlink:href="#clipnote-icon-copy"></use>
+                            </svg>
+                        </span>
+                        <span class="btn-favourite" v-if="!item.recycle" title="添加/取消收藏" @click="favouriteNote(item)">
+                            <i class="element-icons clipnote-icon-favourite"
+                               :style="item.favourite ? 'color: yellow' : 'color: grey'"></i>
+                        </span>
+                        <span class="btn-del" title="删除笔记" @click="deleteNote(item)">
+                            <svg class="icon" aria-hidden="true">
+                                <use xlink:href="#clipnote-icon-delete"></use>
+                            </svg>
+                        </span>
                     </span>
-                    <span class="btn-del" title="删除笔记" @click="deleteNote(item)">
-                        <svg class="icon" aria-hidden="true">
-                            <use xlink:href="#clipnote-icon-delete"></use>
-                        </svg>
-                    </span>
-                </span>
-            </li>
-        </ul>
+                </li>
+            </ul>
+        </el-checkbox-group>
         <div v-else class="no-data">
             这里啥也没有
         </div>
@@ -43,12 +52,20 @@
                    @click.native="editNote()"
                    title="写笔记"
                    v-if="$route.query.categoryId !== Constants.ID.defaultCategoryId"></el-button>
+        <el-button class="btn-delete-batch"
+                   type="danger"
+                   icon="el-icon-delete"
+                   circle
+                   @click.native="deleteNoteBatch()"
+                   v-show="checkedNotes.length > 0"
+                   title="批量删除"></el-button>
     </div>
 </template>
 
 <script>
     import FuzzySearch from 'fuzzy-search'
     import Clipboard from '../utils/Clipboard'
+    const Mousetrap = require('mousetrap')
     export default {
         data() {
             return {
@@ -59,7 +76,9 @@
                 pageCurrent: 1,
                 pageCount: 0,
                 keywords: '',
-                searcher: null
+                searcher: null,
+                checkedAllNotes: false,
+                checkedNotes: []
             }
         },
         watch: {
@@ -94,25 +113,47 @@
                 // 加载搜索结果
                 _this.loadItemList()
             }
+            // 绑定全选快捷键
+            Mousetrap.bind(['command+a', 'ctrl+a'], () => {
+                _this.selectAll()
+                // 返回 false 以防止默认行为，并阻止事件冒泡
+                return false
+            })
+            // 绑定删除键
+            Mousetrap.bind(['del'], () => {
+                _this.deleteNoteBatch()
+                // 返回 false 以防止默认行为，并阻止事件冒泡
+                return false
+            })
         },
         methods: {
             loadItemList() {
                 let _this = this
+                // 重置选中
+                _this.checkedNotes = []
                 let start = _this.pageSize * (_this.pageCurrent - 1)
                 let end = _this.pageSize * _this.pageCurrent
-                let searchInfo = {}
+                let searchInfo = {
+                    recycle: false
+                }
                 if (_this.keywords) {
-                    console.log('search', _this.itemList, _this.keywords)
                     let results = _this.seacher.search(_this.keywords)
                     _this.pageCount = results.length
                     _this.results = results.slice(start, end)
                 } else {
-                    if (_this.categoryId === _this.Constants.ID.favouriteId) {
+                    switch (_this.categoryId) {
+                    case _this.Constants.ID.favouriteId:
                         searchInfo.favourite = true
-                    } else if (_this.categoryId === _this.Constants.ID.defaultCategoryId) {
-                    } else {
+                        break
+                    case _this.Constants.ID.recycleId:
+                        searchInfo.recycle = true
+                        break
+                    case _this.Constants.ID.defaultCategoryId:
+                        break
+                    default:
                         searchInfo.categoryId = _this.categoryId
                     }
+
                     let collections = _this.$db.get('notes')
                     _this.itemList = collections.value()
                     collections = collections.filter(searchInfo)
@@ -125,21 +166,21 @@
             },
             deleteNote(note) {
                 let _this = this
-                let recycle = note.categoryId === _this.Constants.ID.recycleId
+                let recycle = _this.categoryId === _this.Constants.ID.recycleId
                 let info = (recycle ? '删除后将无法恢复，' : '') + '确定删除此笔记吗？'
                 _this.$confirm(info, '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    _this.$db.get('notes').remove({id: note.id}).write()
-                    _this.loadItemList()
                     if (recycle) {
-                        return
+                        _this.$db.get('notes').remove({id: note.id}).write()
+                    } else {
+                        // 转移当前分类下内容到回收站
+                        note.recycle = true
+                        _this.$db.get('notes').find({id: note.id}).assign(note).write()
                     }
-                    // 转移当前分类下内容到回收站
-                    note.categoryId = _this.Constants.ID.recycleId
-                    _this.$db.get('notes').insert(note).write()
+                    _this.loadItemList()
                 }).catch(() => {
                 })
             },
@@ -156,6 +197,39 @@
             pageCurrentChangeHandler(pageCurrent) {
                 let _this = this
                 _this.pageCurrent = pageCurrent
+            },
+            deleteNoteBatch() {
+                let _this = this
+                if (_this.checkedNotes.length === 0) {
+                    return
+                }
+                let collections = _this.$db.get('notes')
+                _this.$confirm('删除后将无法恢复,确定删笔记吗？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    _this.checkedNotes.forEach((id) => {
+                        if (_this.categoryId === _this.Constants.ID.recycleId) {
+                            collections.remove({id: id}).write()
+                        } else {
+                            // 转移当前分类下内容到回收站
+                            let note = collections.find({id: id}).value()
+                            note.recycle = true
+                            collections.assign(note).write()
+                        }
+                        _this.loadItemList()
+                    })
+                }).catch(() => {
+                })
+            },
+            selectAll() {
+                this.checkedNotes = this.results.filter((o) => o.id)
+                console.log(this.checkedNotes)
+            },
+            handleCheckedNotesChange(value) {
+                // 勾选后focus
+                document.querySelector('.list').focus()
             }
         }
     }
@@ -183,14 +257,17 @@
     }
 
     .list .item-title-group {
-        cursor: pointer;
         display: inline-block;
         width: 70%;
         float: left;
     }
 
     .list .item-title-group .item-title {
-        padding-left: 10px;
+        padding-left: 2px;
+    }
+
+    .el-checkbox {
+        margin-left: 8px;
     }
 
     .btn-edit {
@@ -227,5 +304,12 @@
         color: #CDCDCD;
         text-align: center;
         padding-top: 8%;
+    }
+
+    .btn-delete-batch {
+        opacity: 0.3;
+        position: fixed;
+        top: 80px;
+        right: 180px;
     }
 </style>

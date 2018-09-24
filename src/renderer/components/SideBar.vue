@@ -192,7 +192,7 @@
     }
 
     .sidebar .active {
-        background-color: rgb(255, 201, 177);
+        background-color: rgb(190, 248, 255);
     }
 
     .sidebar .item {

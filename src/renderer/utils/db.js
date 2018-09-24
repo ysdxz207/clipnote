@@ -4,8 +4,13 @@ import path from 'path'
 import electron from 'electron'
 import Constants from './Constants'
 
+const fs = require('fs')
+
 const userDataPath = (electron.app || electron.remote.app).getPath('home')
 const DB_DIR = path.join(userDataPath, 'clipnote')
+if (!fs.existsSync(DB_DIR)) {
+    fs.mkdirSync(DB_DIR)
+}
 const DB_PATH = path.join(DB_DIR, 'clipnote.json')
 const adapter = new FileSync(DB_PATH)
 const db = Datastore(adapter)

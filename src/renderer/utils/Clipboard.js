@@ -24,6 +24,7 @@ clip.watchOrUnWatch = function (callback) {
                 return
             }
             $db.get('notes').insert({
+                recycle: false,
                 categoryId: Constants.ID.clipboardId,
                 context: currentText,
                 title: currentText.substring(0, 20),
