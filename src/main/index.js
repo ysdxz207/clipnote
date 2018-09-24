@@ -11,7 +11,6 @@ const path = require('path')
 const Menu = electron.Menu
 const windowManager = require('electron-window-manager')
 const ICON_PATH = path.join(__static, 'assets/icons/app/icon.ico')
-
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -45,8 +44,6 @@ function init() {
         alwaysOnTop: true,
         transparent: true
     }).create().object
-
-    console.log('window,', mainWindow)
 
     mainWindow.on('closed', (e) => {
         mainWindow = null

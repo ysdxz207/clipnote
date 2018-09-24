@@ -1,6 +1,6 @@
 <template>
     <div class="list">
-        <ul v-if="results.length > 0">
+        <ul v-if="results.length > 0" class="list-ul">
             <li v-for="(item, index) in results"
                 :key="index">
                 <span class="item-title-group" title="点击编辑笔记" @click="editNote(item.id)">
@@ -27,6 +27,15 @@
         <div v-else class="no-data">
             这里啥也没有
         </div>
+        <div style="margin-top: 30px;text-align: center">
+            <el-pagination
+                    v-if="pageCount > pageSize"
+                    :page-size="pageSize"
+                    layout="prev, pager, next"
+                    :total="pageCount"
+                    @current-change="pageCurrentChangeHandler">
+            </el-pagination>
+        </div>
         <el-button class="btn-edit"
                    type="success"
                    icon="el-icon-edit"
@@ -38,6 +47,7 @@
 </template>
 
 <script>
+    import FuzzySearch from 'fuzzy-search'
     import Clipboard from '../utils/Clipboard'
     export default {
         data() {
@@ -45,20 +55,28 @@
                 categoryId: this.$route.query.categoryId || this.Constants.ID.defaultCategoryId,
                 itemList: [],
                 results: [],
-                keys: ['title', 'context']
+                pageSize: 20,
+                pageCurrent: 1,
+                pageCount: 0,
+                keywords: '',
+                searcher: null
             }
         },
         watch: {
             '$route'(to, from) {
                 this.categoryId = this.$route.query.categoryId || this.Constants.ID.defaultCategoryId
                 this.loadItemList()
+            },
+            'pageCurrent' (newValue, oldValue) {
+                this.loadItemList()
             }
-
         },
         created() {
             let _this = this
             _this.bus.$on('search', function (keywords) {
-                _this.triggerSearch(keywords)
+                _this.keywords = keywords
+                _this.pageCurrent = 1
+                _this.loadItemList()
             })
             this.$on('results', results => {
                 this.results = results
@@ -67,39 +85,40 @@
         mounted() {
             let _this = this
             _this.loadItemList()
+            _this.seacher = new FuzzySearch(_this.itemList, ['title', 'context'], {
+                caseSensitive: false,
+                sort: true
+            })
+            _this.keywords = document.querySelector('.input-search').value
+            if (_this.keywords) {
+                // 加载搜索结果
+                _this.loadItemList()
+            }
         },
         methods: {
-            triggerSearch(keywords) {
-                let _this = this
-                _this.itemList = _this.$db.get('notes').sortBy('time').value().reverse()
-                const str = keywords.toLowerCase()
-                if (!str) {
-                    _this.results = _this.itemList
-                    return
-                }
-
-                _this.results = _this.itemList.filter(item => {
-                    let pos = 0
-                    let target = item.title + ' ' + item.context
-                    return [...str].every(s => {
-                        target = target.substr(pos)
-                        pos = target.indexOf(s) + 1
-                        return pos > 0
-                    })
-                })
-            },
             loadItemList() {
                 let _this = this
+                let start = _this.pageSize * (_this.pageCurrent - 1)
+                let end = _this.pageSize * _this.pageCurrent
                 let searchInfo = {}
-                if (_this.categoryId === _this.Constants.ID.favouriteId) {
-                    searchInfo.favourite = true
-                } else if (_this.categoryId === _this.Constants.ID.defaultCategoryId) {
+                if (_this.keywords) {
+                    console.log('search', _this.itemList, _this.keywords)
+                    let results = _this.seacher.search(_this.keywords)
+                    _this.pageCount = results.length
+                    _this.results = results.slice(start, end)
                 } else {
-                    searchInfo.categoryId = _this.categoryId
+                    if (_this.categoryId === _this.Constants.ID.favouriteId) {
+                        searchInfo.favourite = true
+                    } else if (_this.categoryId === _this.Constants.ID.defaultCategoryId) {
+                    } else {
+                        searchInfo.categoryId = _this.categoryId
+                    }
+                    let collections = _this.$db.get('notes')
+                    _this.itemList = collections.value()
+                    collections = collections.filter(searchInfo)
+                    _this.pageCount = collections.size().value()
+                    _this.results = collections.sortBy('time').slice(start, end).cloneDeep().value().reverse()
                 }
-                _this.itemList = _this.$db.get('notes').filter(searchInfo)
-                    .sortBy('time').cloneDeep().value().reverse()
-                _this.results = _this.itemList
             },
             editNote(id) {
                 this.$router.push({name: 'edit', query: {id: id, categoryId: this.categoryId}})
@@ -133,24 +152,29 @@
                 Clipboard.copyToClipboard(title).then(() => {
                     this.$message.success('已复制标题')
                 })
+            },
+            pageCurrentChangeHandler(pageCurrent) {
+                let _this = this
+                _this.pageCurrent = pageCurrent
             }
         }
     }
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 
     .list {
+        margin-bottom: 100px;
     }
 
-    .list ul {
+    .list-ul {
         list-style: none;
         padding: 0;
         margin: 0;
         background-color: #FFFFFF;
     }
 
-    .list li {
+    .list-ul li {
         color: #494949;
         height: 40px;
         line-height: 40px;

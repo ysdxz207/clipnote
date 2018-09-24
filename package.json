@@ -69,7 +69,8 @@
     "auto-launch": "^5.0.5",
     "windows-shortcuts": "^0.1.6",
     "electron-window-manager": "^1.0.6",
-    "lodash-id": "^0.14.0"
+    "lodash-id": "^0.14.0",
+    "fuzzy-search": "^2.1.0"
   },
   "devDependencies": {
     "ajv": "^6.5.0",

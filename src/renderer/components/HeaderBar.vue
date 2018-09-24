@@ -60,7 +60,7 @@
     }
 
     .header .input-search {
-        background-color: #F8F8F8;
+        background-color: #FAFAFA;
         border: none;
         border-bottom: 1px solid #DDDDDD;
         box-shadow: none;
@@ -69,8 +69,12 @@
     }
 
     .input-search:focus {
-        border-color: #9C9C9C;
+        border-color: #636363;
         outline: 0;
+    }
+
+    .input-search::-webkit-input-placeholder{
+        color: #DADADA;
     }
 
 </style>

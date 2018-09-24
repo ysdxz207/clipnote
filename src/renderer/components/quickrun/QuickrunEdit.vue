@@ -30,15 +30,13 @@
         data() {
             return {
                 shortcut: {
-                },
-                shortcutTemp: {}
+                }
             }
         },
         created() {
         },
         mounted() {
             electron.ipcRenderer.on('shortcut', (event, shortcut) => {
-                this.shortcutTemp = JSON.parse(JSON.stringify(shortcut))
                 this.shortcut = shortcut
             })
             // ESC
@@ -48,10 +46,7 @@
         methods: {
             editShortcut() {
                 let _this = this
-                electron.ipcRenderer.send('shortcutEdit', {
-                    source: _this.shortcutTemp,
-                    target: _this.shortcut
-                })
+                electron.ipcRenderer.send('shortcutEdit', _this.shortcut)
                 electron.remote.getCurrentWindow().hide()
             },
             deleteShortcut() {
@@ -65,7 +60,7 @@
                     defaultId: 1
                 }, (index) => {
                     if (index === 0) {
-                        electron.ipcRenderer.send('shortcutDelete', _this.shortcutTemp)
+                        electron.ipcRenderer.send('shortcutDelete', _this.shortcut)
                         electron.remote.getCurrentWindow().hide()
                     }
                 })

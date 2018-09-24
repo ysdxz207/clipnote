@@ -58,7 +58,7 @@
                 console.log('edit:', o)
                 _this.$db.get('shortcuts').find({
                     id: o.id
-                }).assign().write()
+                }).assign(o).write()
                 _this.loadQuickrunList()
             })
             // 删除快捷方式，放在quickrunEdit里会数据不同步

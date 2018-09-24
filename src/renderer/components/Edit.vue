@@ -21,6 +21,7 @@
 </template>
 
 <script>
+    import electron from 'electron'
     import Clipboard from '../utils/Clipboard'
     export default {
         data() {
@@ -28,8 +29,7 @@
                 note: {
                     id: this.$route.query.id,
                     categoryId: this.$route.query.categoryId
-                },
-                noteTemp: {}
+                }
             }
         },
         mounted() {
@@ -58,14 +58,14 @@
                     _this.$db.get('notes').find({
                         id: _this.note.id
                     }).assign(_this.note).write()
-                    // 添加成功跳转到对应分类
-                    _this.$router.push({name: 'list', query: {categoryId: _this.note.categoryId}})
                 } else {
                     _this.note.time = new Date().getTime()
-                    _this.$db.get('notes').insert(_this.note).write()
-                    // 添加成功跳转到对应分类
-                    _this.$router.push({name: 'list', query: {categoryId: _this.note.categoryId}})
+                    _this.note = _this.$db.get('notes').insert(_this.note).write()
                 }
+                // 添加到搜索引擎
+                electron.ipcRenderer.send('lunr', _this.note)
+                // 编辑成功跳转到对应分类
+                _this.$router.push({name: 'list', query: {categoryId: _this.note.categoryId}})
             },
             cancelEdit() {
                 let _this = this
