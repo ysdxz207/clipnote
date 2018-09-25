@@ -25,8 +25,6 @@ const winURL = Constants.URL.index
 const settingURL = winURL + '#/setting'
 const quickrunURL = winURL + '#/quickrun'
 
-const settingURL = winURL + '/#/setting'
-
 // 开机启动
 let clipnoteAutoLauncher = new AutoLaunch({
     name: app.getName(),
@@ -183,32 +181,8 @@ const shouldQuit = app.makeSingleInstance((commandLine, workingDirectory) => {
     }
 })
 
-<<<<<<< HEAD
-function settings() {
-    let child = new BrowserWindow({
-        width: 1000,
-        height: 600,
-        parent: mainWindow,
-        modal: true,
-        show: false,
-        resizable: false,
-        webPreferences: {
-            webSecurity: false
-        }
-    })
-    if (process.env.NODE_ENV === 'development') {
-        child.loadURL(settingURL)
-    } else {
-        child.loadFile(settingURL)
-    }
-    child.once('ready-to-show', () => {
-        child.show()
-    })
-    child.openDevTools()
-=======
 if (shouldQuit) {
     app.quit()
->>>>>>> lowdb
 }
 
 app.on('ready', init)
