@@ -33,7 +33,7 @@
             </div>
         </div>
         <div class="category">
-            <el-row class="item">
+            <el-row class="item" style="cursor: default;">
                 <el-col :span="12">
                     <svg class="icon" aria-hidden="true">
                         <use xlink:href="#clipnote-icon-category"></use>
@@ -78,13 +78,11 @@
         watch: {
             '$route'(to, from) {
                 let state = this.$route.query.state || this.Constants.STATE.available
-                console.log('---', state)
                 if (state === this.Constants.STATE.available) {
                     this.activeSidebar = this.$route.query.categoryId
                 } else {
                     this.activeSidebar = state
                 }
-                console.log('===', this.activeSidebar)
             }
 
         },
@@ -142,7 +140,6 @@
                 if (state) {
                     query.state = state
                 }
-                console.log('show list of:' + JSON.stringify(query))
                 this.$router.push({name: 'list', query: query})
             },
             deleteCategory(id) {
@@ -178,7 +175,6 @@
                 _this.$watch('conf.clipboardCollection', {
                     deep: true,
                     handler: function () {
-                        console.log('change clipboardCollection')
                         _this.$db.update('config', (o) => {
                             return _this.conf
                         }).write()

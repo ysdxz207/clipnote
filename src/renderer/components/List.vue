@@ -10,21 +10,21 @@
                         </el-checkbox>
                     </span>
                     <span class="item-btn-group">
-                        <span class="btn-favourite" title="编辑" @click="editNote(item.id)">
+                        <span class="btn-list-operation" title="编辑" @click="editNote(item.id)">
                             <svg class="icon" aria-hidden="true">
                                 <use xlink:href="#clipnote-icon-edit"></use>
                             </svg>
                         </span>
-                        <span class="btn-favourite" title="复制标题" @click="copyNoteTitle(item.title)">
+                        <span class="btn-list-operation" title="复制标题" @click="copyNoteTitle(item.title)">
                             <svg class="icon" aria-hidden="true">
                                 <use xlink:href="#clipnote-icon-copy"></use>
                             </svg>
                         </span>
-                        <span class="btn-favourite" v-if="!item.recycle" title="添加/取消收藏" @click="favouriteNote(item)">
+                        <span class="btn-list-operation" v-if="item.state !== Constants.STATE.recycle" title="添加/取消收藏" @click="favouriteNote(item)">
                             <i class="element-icons clipnote-icon-favourite"
-                               :style="item.favourite ? 'color: yellow' : 'color: grey'"></i>
+                               :style="item.state === Constants.STATE.favourite ? 'color: yellow' : 'color: grey'"></i>
                         </span>
-                        <span class="btn-revert" v-if="item.state === Constants.STATE.recycle" title="恢复笔记" @click="revertNote(item.id)">
+                        <span class="btn-list-operation" v-if="item.state === Constants.STATE.recycle" title="恢复笔记" @click="revertNote(item.id)">
                             <svg class="icon" aria-hidden="true">
                                 <use xlink:href="#clipnote-icon-revert"></use>
                             </svg>
@@ -56,7 +56,7 @@
                    circle
                    @click.native="editNote()"
                    title="写笔记"
-                   v-if="$route.query.categoryId !== Constants.ID.defaultCategoryId"></el-button>
+                   v-if="$route.query.categoryId && $route.query.categoryId !== Constants.ID.defaultCategoryId"></el-button>
         <el-button class="btn-delete-batch"
                    type="danger"
                    icon="el-icon-delete"
@@ -89,7 +89,6 @@
         },
         watch: {
             '$route'(to, from) {
-                console.log('list路由变化', this.$route.query)
                 this.state = this.$route.query.state || null
                 this.categoryId = this.$route.query.categoryId || null
                 this.loadItemList()
@@ -151,6 +150,9 @@
                 }
                 results = results.filter(o => {
                     if (_this.categoryId !== null) {
+                        if (_this.categoryId === _this.Constants.ID.defaultCategoryId) {
+                            return o.state !== _this.Constants.STATE.recycle
+                        }
                         return o.categoryId === _this.categoryId && o.state !== _this.Constants.STATE.recycle
                     } else {
                         return o.state === _this.state
@@ -175,7 +177,6 @@
                     if (recycle) {
                         collections.remove({id: note.id}).write()
                     } else {
-                        console.log('转移到回收站', note)
                         // 转移当前分类下内容到回收站
                         note.state = _this.Constants.STATE.recycle
                         collections.find({id: note.id}).assign(note).write()
@@ -229,7 +230,6 @@
             },
             handleCheckedNotesChange(value) {
                 // 勾选后focus
-                document.querySelector('')
                 document.querySelector('.list').focus()
             },
             revertNote(id) {
@@ -298,6 +298,7 @@
         display: inline-block;
         width: 40%;
         text-align: right;
+        font-size: 20px;
     }
 
     .btn-del {
@@ -306,14 +307,13 @@
         margin-right: 16px;
     }
 
-    .btn-revert {
+    .btn-list-operation {
         cursor: pointer;
         margin: 0 8px;
     }
 
-    .btn-favourite {
-        cursor: pointer;
-        margin: 0 8px;
+    .btn-list-operation .element-icons {
+        font-size: 20px;
     }
 
     .no-data {
@@ -329,5 +329,9 @@
         position: fixed;
         top: 80px;
         right: 180px;
+    }
+    svg {
+        width: 20px;
+        height: 20px;
     }
 </style>
