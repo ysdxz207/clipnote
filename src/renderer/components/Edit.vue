@@ -14,7 +14,7 @@
             </el-form-item>
             <el-form-item>
                 <el-button type="success" @click="editNote" size="mini">保存</el-button>
-                <el-button @click="cancelEdit" size="mini">取消</el-button>
+                <el-button @click="goToList" size="mini">取消</el-button>
             </el-form-item>
         </el-form>
     </transition>
@@ -66,11 +66,17 @@
                 // 添加到搜索引擎
                 electron.ipcRenderer.send('lunr', _this.note)
                 // 编辑成功跳转到对应分类
-                _this.$router.push({name: 'list', query: {categoryId: _this.note.categoryId}})
+                _this.goToList()
             },
-            cancelEdit() {
+            goToList() {
                 let _this = this
-                _this.$router.push({name: 'list', query: {categoryId: _this.note.categoryId}})
+                let query = {}
+                if (_this.note.state !== _this.Constants.STATE.available) {
+                    query.state = _this.note.state
+                } else {
+                    query.categoryId = _this.note.categoryId
+                }
+                _this.$router.push({name: 'list', query: query})
             },
             copyNote() {
                 Clipboard.copyToClipboard(this.note.context).then(() => {
