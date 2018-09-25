@@ -24,6 +24,11 @@
                             <i class="element-icons clipnote-icon-favourite"
                                :style="item.favourite ? 'color: yellow' : 'color: grey'"></i>
                         </span>
+                        <span class="btn-revert" v-if="item.state === Constants.STATE.recycle" title="恢复笔记" @click="revertNote(item.id)">
+                            <svg class="icon" aria-hidden="true">
+                                <use xlink:href="#clipnote-icon-revert"></use>
+                            </svg>
+                        </span>
                         <span class="btn-del" title="删除笔记" @click="deleteNote(item)">
                             <svg class="icon" aria-hidden="true">
                                 <use xlink:href="#clipnote-icon-delete"></use>
@@ -38,10 +43,10 @@
         </div>
         <div style="margin-top: 30px;text-align: center">
             <el-pagination
-                    v-if="pageCount > pageSize"
+                    v-if="total > pageSize"
                     :page-size="pageSize"
                     layout="prev, pager, next"
-                    :total="pageCount"
+                    :total="total"
                     @current-change="pageCurrentChangeHandler">
             </el-pagination>
         </div>
@@ -70,12 +75,12 @@
         data() {
             return {
                 categoryId: this.$route.query.categoryId || null,
-                state: this.$route.query.state || this.Constants.STATE.available,
+                state: this.$route.query.state || null,
                 itemList: [],
                 results: [],
                 pageSize: 20,
                 pageCurrent: 1,
-                pageCount: 0,
+                total: 0,
                 keywords: '',
                 searcher: null,
                 checkedAllNotes: false,
@@ -84,7 +89,9 @@
         },
         watch: {
             '$route'(to, from) {
-                this.categoryId = this.$route.query.categoryId || this.Constants.ID.defaultCategoryId
+                console.log('list路由变化', this.$route.query)
+                this.state = this.$route.query.state || null
+                this.categoryId = this.$route.query.categoryId || null
                 this.loadItemList()
             },
             'pageCurrent' (newValue, oldValue) {
@@ -130,53 +137,48 @@
         methods: {
             loadItemList() {
                 let _this = this
-                console.log(_this.categoryId, _this.state)
                 // 重置选中
                 _this.checkedNotes = []
-                // 查询所有数据
-                let collections = _this.$db.get('notes')
-                _this.itemList = collections.value()
-                _this.pageCount = collections.size().value()
-                _this.results = collections.sortBy('time').slice(start, end).cloneDeep().value().reverse()
-
                 let start = _this.pageSize * (_this.pageCurrent - 1)
                 let end = _this.pageSize * _this.pageCurrent
+                // 查询所有数据
+                let collections = _this.$db.get('notes')
+                _this.itemList = collections.sortBy('time').cloneDeep().value().reverse()
+
+                let results = _this.itemList
                 if (_this.keywords) {
-                    let results = _this.seacher.search(_this.keywords).filter(o => {
-                        if (_this.categoryId !== null) {
-                            return o.categoryId === _this.categoryId && _this.state !== _this.Constants.STATE.recycle
-                        } else {
-                            return o.state === _this.state
-                        }
-                    })
-                    _this.pageCount = results.length
-                    _this.results = results.slice(start, end)
-                } else {
-                    let queryInfo = {}
-                    if (_this.categoryId !== null) {
-                        queryInfo.categoryId = _this.categoryId
-                    }
-                    queryInfo.state = _this.state
+                    results = _this.seacher.search(_this.keywords)
                 }
+                results = results.filter(o => {
+                    if (_this.categoryId !== null) {
+                        return o.categoryId === _this.categoryId && o.state !== _this.Constants.STATE.recycle
+                    } else {
+                        return o.state === _this.state
+                    }
+                })
+                _this.total = results.length
+                _this.results = results.slice(start, end)
             },
             editNote(id) {
                 this.$router.push({name: 'edit', query: {id: id, categoryId: this.categoryId}})
             },
             deleteNote(note) {
                 let _this = this
-                let recycle = _this.categoryId === _this.Constants.ID.recycleId
+                let recycle = note.state === _this.Constants.STATE.recycle
                 let info = (recycle ? '删除后将无法恢复，' : '') + '确定删除此笔记吗？'
                 _this.$confirm(info, '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
+                    let collections = _this.$db.get('notes')
                     if (recycle) {
-                        _this.$db.get('notes').remove({id: note.id}).write()
+                        collections.remove({id: note.id}).write()
                     } else {
+                        console.log('转移到回收站', note)
                         // 转移当前分类下内容到回收站
-                        _this.note.state = _this.Constants.STATE.recycle
-                        _this.$db.get('notes').find({id: note.id}).assign(note).write()
+                        note.state = _this.Constants.STATE.recycle
+                        collections.find({id: note.id}).assign(note).write()
                     }
                     _this.loadItemList()
                 }).catch(() => {
@@ -227,7 +229,20 @@
             },
             handleCheckedNotesChange(value) {
                 // 勾选后focus
+                document.querySelector('')
                 document.querySelector('.list').focus()
+            },
+            revertNote(id) {
+                let _this = this
+                _this.$confirm('确定还原笔记吗？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    _this.$db.get('notes').find({id: id}).assign({state: _this.Constants.STATE.available}).write()
+                    _this.loadItemList()
+                }).catch(() => {
+                })
             }
         }
     }
@@ -256,7 +271,7 @@
 
     .list .item-title-group {
         display: inline-block;
-        width: 70%;
+        width: 60%;
         float: left;
     }
 
@@ -281,7 +296,7 @@
 
     .item-btn-group {
         display: inline-block;
-        width: 30%;
+        width: 40%;
         text-align: right;
     }
 
@@ -289,6 +304,11 @@
         cursor: pointer;
         margin-left: 8px;
         margin-right: 16px;
+    }
+
+    .btn-revert {
+        cursor: pointer;
+        margin: 0 8px;
     }
 
     .btn-favourite {

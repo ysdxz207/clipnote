@@ -51,7 +51,7 @@
                 <li v-for="(o, index) in categoryList"
                     :key="index"
                     :class="(o.id === activeSidebar) ? 'active' : ''">
-                    <span class="name" @click="showItemList(Constants.STATE.available, o.id)">{{o.name}}</span>
+                    <span class="name" @click="showItemList(null, o.id)">{{o.name}}</span>
                     <span class="btn-delete"
                           @click="deleteCategory(o.id)"
                           v-if="o.id !== Constants.ID.defaultCategoryId">
@@ -78,11 +78,13 @@
         watch: {
             '$route'(to, from) {
                 let state = this.$route.query.state || this.Constants.STATE.available
+                console.log('---', state)
                 if (state === this.Constants.STATE.available) {
                     this.activeSidebar = this.$route.query.categoryId
                 } else {
                     this.activeSidebar = state
                 }
+                console.log('===', this.activeSidebar)
             }
 
         },
@@ -92,7 +94,7 @@
             let _this = this
             _this.loadCategoryList()
             // 选中并加载全部笔记分类
-            _this.showItemList(_this.Constants.STATE.available, _this.Constants.ID.defaultCategoryId)
+            _this.showItemList(_this.Constants.STATE.available)
             // 是否开启剪贴板收集功能
             setTimeout(_this.loadClipboardCollection(), 2000)
         },
@@ -133,12 +135,14 @@
                 })
             },
             showItemList(state, categoryId) {
-                let query = {
-                    state
-                }
+                let query = {}
                 if (categoryId) {
                     query.categoryId = categoryId
                 }
+                if (state) {
+                    query.state = state
+                }
+                console.log('show list of:' + JSON.stringify(query))
                 this.$router.push({name: 'list', query: query})
             },
             deleteCategory(id) {
