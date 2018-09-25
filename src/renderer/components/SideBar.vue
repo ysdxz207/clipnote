@@ -92,7 +92,7 @@
             let _this = this
             _this.loadCategoryList()
             // 选中并加载全部笔记分类
-            _this.showItemList(_this.Constants.STATE.available)
+            _this.showItemList(null, _this.Constants.ID.defaultCategoryId)
             // 是否开启剪贴板收集功能
             setTimeout(_this.loadClipboardCollection(), 2000)
         },

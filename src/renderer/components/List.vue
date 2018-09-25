@@ -5,7 +5,7 @@
                 <li v-for="item in results"
                     :key="item.id">
                     <span class="item-title-group">
-                        <el-checkbox :label="item.id" :disabled="$route.query.categoryId === Constants.ID.defaultCategoryId">
+                        <el-checkbox :label="item.id">
                             <span class="item-title">{{item.title.length > 20 ? (item.title.substring(0, 20) + '...') : item.title}}</span>
                         </el-checkbox>
                     </span>
@@ -24,9 +24,12 @@
                             <i class="element-icons clipnote-icon-favourite"
                                :style="item.state === Constants.STATE.favourite ? 'color: yellow' : 'color: grey'"></i>
                         </span>
-                        <span class="btn-list-operation" v-if="item.state === Constants.STATE.recycle" title="恢复笔记" @click="revertNote(item.id)">
-                            <svg class="icon" aria-hidden="true">
+                        <span class="btn-list-operation" v-if="item.state === Constants.STATE.recycle" title="恢复笔记" @click="revertNote(item)">
+                            <svg class="icon" aria-hidden="true" v-if="item.categoryId">
                                 <use xlink:href="#clipnote-icon-revert"></use>
+                            </svg>
+                            <svg class="icon" aria-hidden="true" v-else>
+                                <use xlink:href="#clipnote-icon-unrevert"></use>
                             </svg>
                         </span>
                         <span class="btn-del" title="删除笔记" @click="deleteNote(item)">
@@ -217,7 +220,7 @@
                         } else {
                             // 转移当前分类下内容到回收站
                             let note = collections.find({id: id}).value()
-                            _this.note.state = _this.Constants.STATE.recycle
+                            note.state = _this.Constants.STATE.recycle
                             collections.assign(note).write()
                         }
                         _this.loadItemList()
@@ -232,14 +235,17 @@
                 // 勾选后focus
                 document.querySelector('.list').focus()
             },
-            revertNote(id) {
+            revertNote(item) {
                 let _this = this
+                if (!item.categoryId) {
+                    return
+                }
                 _this.$confirm('确定还原笔记吗？', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    _this.$db.get('notes').find({id: id}).assign({state: _this.Constants.STATE.available}).write()
+                    _this.$db.get('notes').find({id: item.id}).assign({state: _this.Constants.STATE.available}).write()
                     _this.loadItemList()
                 }).catch(() => {
                 })
