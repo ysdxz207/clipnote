@@ -14,7 +14,7 @@
                     <input type="text"
                            v-model="keywords"
                            placeholder="搜索"
-                           class="input-search" @keyup="search"/>
+                           class="input-search"/>
                 </label>
             </el-col>
         </el-col>
@@ -28,9 +28,13 @@
                 keywords: ''
             }
         },
+        watch: {
+            'keywords': function(newVal, oldVal) {
+                this.search()
+            }
+        },
         methods: {
             search() {
-                this.$router.push({name: 'list', query: {categoryId: '0000000000_default_category', type: 'note'}})
                 this.bus.$emit('search', this.keywords)
             }
         }
@@ -43,7 +47,7 @@
         z-index: 1;
         color: #232323;
         line-height: 40px;
-        background-color: #F8F8F8;
+        background-color: #FAFAFA;
         height: 100%;
         box-shadow: 0 1px 4px rgba(0,0,0,.25);
     }
@@ -55,7 +59,7 @@
     }
 
     .header .input-search {
-        background-color: #F8F8F8;
+        background-color: #FAFAFA;
         border: none;
         border-bottom: 1px solid #DDDDDD;
         box-shadow: none;
@@ -64,8 +68,12 @@
     }
 
     .input-search:focus {
-        border-color: #9C9C9C;
+        border-color: #636363;
         outline: 0;
+    }
+
+    .input-search::-webkit-input-placeholder{
+        color: #DADADA;
     }
 
 </style>

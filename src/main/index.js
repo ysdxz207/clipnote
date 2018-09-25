@@ -1,19 +1,16 @@
 'use strict'
 
-import Config from '../renderer/utils/Config'
 import Shortcut from '../renderer/utils/Shortcut'
-
+import Constants from '../renderer/utils/Constants'
+import $db from '../renderer/utils/db'
 const electron = require('electron')
 const app = electron.app
-const BrowserWindow = electron.BrowserWindow
 const Tray = electron.Tray
 const AutoLaunch = require('auto-launch')
 const path = require('path')
 const Menu = electron.Menu
-const ipcMain = electron.ipcMain
-
+const windowManager = require('electron-window-manager')
 const ICON_PATH = path.join(__static, 'assets/icons/app/icon.ico')
-
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -22,96 +19,151 @@ if (process.env.NODE_ENV !== 'development') {
     global.__static = path.join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-let mainWindow, tray
-const winURL = process.env.NODE_ENV === 'development'
-    ? `http://localhost:9080`
-    : `file://${__dirname}/index.html`
+let mainWindow, quickrunWindow, settingsWindow, tray
+const winURL = Constants.URL.index
+
+const settingURL = winURL + '#/setting'
+const quickrunURL = winURL + '#/quickrun'
 
 const settingURL = winURL + '/#/setting'
 
 // 开机启动
-var clipnoteAutoLauncher = new AutoLaunch({
+let clipnoteAutoLauncher = new AutoLaunch({
     name: app.getName(),
     path: process.cwd() + path.sep + app.getName() + '.exe'
 })
 
-function createWindow() {
-    /**
-     * Initial window options
-     */
-    mainWindow = new BrowserWindow({
-        width: 1000,
-        height: 563,
+function init() {
+    // 创建笔记窗口
+    windowManager.init({})
+    mainWindow = windowManager.createNew(Constants.NAME.MAIN, '', winURL, false, {
+        width: process.env.DEBUG === 'yes' ? 1000 : 830,
+        height: 562,
         frame: false,
         useContentSize: true,
         resizable: false,
         show: false,
+        alwaysOnTop: true,
         transparent: true
-    })
-
-    mainWindow.loadURL(winURL)
+    }).create().object
 
     mainWindow.on('closed', (e) => {
         mainWindow = null
     })
-    // 初始化配置
-    Config.save(undefined, () => {
-        // 注册快捷键
-        Shortcut.registShortCut(mainWindow, 'toggleMain')
+    mainWindow.on('minimize', (e) => {
+        mainWindow.hide()
     })
+    // 创建quickrun窗口
+    quickrunWindow = windowManager.createNew(Constants.NAME.QUICKRUN, '', quickrunURL, false, {
+        width: process.env.DEBUG === 'yes' ? 720 : 220,
+        height: 560,
+        frame: false,
+        useContentSize: true,
+        resizable: false,
+        show: true,
+        transparent: true,
+        alwaysOnTop: true,
+        webPreferences: {
+            webSecurity: false
+        }
+    }).create().object
+    quickrunWindow.on('closed', (e) => {
+        quickrunWindow = null
+    })
+    quickrunWindow.on('minimize', (e) => {
+        quickrunWindow.hide()
+    })
+    if (process.env.DEBUG === 'yes') {
+        quickrunWindow.openDevTools()
+    }
+    // 创建设置窗口
+    settingsWindow = windowManager.createNew(Constants.NAME.SETTING, '', settingURL, false, {
+        width: process.env.DEBUG === 'yes' ? 1000 : 600,
+        height: 400,
+        parent: mainWindow,
+        frame: false,
+        modal: true,
+        show: false,
+        resizable: false,
+        webPreferences: {
+            webSecurity: false
+        }
+    }).create().object
+    if (process.env.DEBUG === 'yes') {
+        settingsWindow.openDevTools()
+    }
+    // 注册快捷键
+    Shortcut.registShortCut(mainWindow, 'toggleMain')
+    Shortcut.registShortCut(quickrunWindow, 'toggleQuickrun')
+    // 注册托盘
     registTray()
 }
 
 function registTray() {
     // 读取配置
-    Config.read((conf) => {
-        tray = new Tray(ICON_PATH)
-        const contextMenu = Menu.buildFromTemplate([
-            {
-                label: '源码',
-                type: 'normal',
-                click() {
-                    require('electron').shell.openExternal('https://github.com/ysdxz207/clipnote.git')
+    let conf = $db.get('config').value()
+    tray = new Tray(ICON_PATH)
+    const contextMenu = Menu.buildFromTemplate([
+        {
+            label: '关于',
+            type: 'normal',
+            click() {
+                if (!mainWindow.isVisible()) {
+                    mainWindow.show()
                 }
-            },
-            {
-                label: '设置',
-                type: 'normal',
-                click() {
-                    settings()
-                }
-            },
-            {
-                label: '开机启动',
-                type: 'checkbox',
-                checked: conf['startup'],
-                click(menuItem) {
-                    conf['startup'] = menuItem.checked
-                    Config.save(conf, function () {
-                        // 处理开机启动项
-                        toggleStartUp(menuItem.checked)
-                    })
-                }
-            },
-            {
-                label: '退出',
-                type: 'normal',
-                click() {
-                    app.quit()
-                }
+                electron.dialog.showMessageBox(mainWindow, {
+                    type: 'info',
+                    message: '当前版本：' + require('../../package').version
+                })
             }
-        ])
-        tray.setToolTip('点击显示/隐藏主窗体')
-        tray.setContextMenu(contextMenu)
+        },
+        {
+            label: '源码',
+            type: 'normal',
+            click() {
+                require('electron').shell.openExternal('https://github.com/ysdxz207/clipnote.git')
+            }
+        },
+        {
+            label: '设置',
+            type: 'normal',
+            click() {
+                if (!mainWindow.isVisible()) {
+                    mainWindow.show()
+                }
+                settingsWindow.show()
+            }
+        },
+        {
+            label: '开机启动',
+            type: 'checkbox',
+            checked: conf['startup'],
+            click(menuItem) {
+                conf['startup'] = menuItem.checked
+                $db.update('config', (o) => {
+                    return conf
+                }).write()
+                toggleStartUp(menuItem.checked)
+            }
+        },
+        {
+            label: '退出',
+            type: 'normal',
+            click() {
+                app.quit()
+            }
+        }
+    ])
+    tray.setToolTip('点击显示/隐藏主窗体')
+    tray.setContextMenu(contextMenu)
 
-        tray.on('click', function (e) {
-            // 单击显示主窗体
-            if (mainWindow.isVisible()) {
-                mainWindow.hide()
-            } else {
-                mainWindow.show()
-            }
-        })
+    tray.on('click', function (e) {
+        // 单击显示主窗体
+        if (mainWindow.isVisible()) {
+            mainWindow.hide()
+        } else {
+            mainWindow.show()
+        }
     })
 }
 
@@ -122,7 +174,16 @@ function toggleStartUp(startup) {
         clipnoteAutoLauncher.disable()
     }
 }
+// 单开程序
+const shouldQuit = app.makeSingleInstance((commandLine, workingDirectory) => {
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+        if (!mainWindow.isVisible()) mainWindow.show()
+        mainWindow.focus()
+    }
+})
 
+<<<<<<< HEAD
 function settings() {
     let child = new BrowserWindow({
         width: 1000,
@@ -144,13 +205,13 @@ function settings() {
         child.show()
     })
     child.openDevTools()
+=======
+if (shouldQuit) {
+    app.quit()
+>>>>>>> lowdb
 }
 
-ipcMain.on('hideWindow', () => {
-    mainWindow.hide()
-})
-
-app.on('ready', createWindow)
+app.on('ready', init)
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
@@ -160,7 +221,7 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
     if (mainWindow === null) {
-        createWindow()
+        init()
     }
 })
 

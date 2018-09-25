@@ -10,47 +10,40 @@
                           rows="12" placeholder="请输入笔记内容"></el-input>
             </el-form-item>
             <el-form-item>
+                <el-button type="default" @click="copyNote" plain size="mini">复制</el-button>
+            </el-form-item>
+            <el-form-item>
                 <el-button type="success" @click="editNote" size="mini">保存</el-button>
-                <el-button @click="cancelEdit" size="mini">取消</el-button>
+                <el-button @click="goToList" size="mini">取消</el-button>
             </el-form-item>
         </el-form>
     </transition>
 </template>
 
 <script>
+    import electron from 'electron'
+    import Clipboard from '../utils/Clipboard'
     export default {
         data() {
             return {
                 note: {
-                    _id: this.$route.query.id,
-                    type: 'note',
+                    id: this.$route.query.id,
                     categoryId: this.$route.query.categoryId
-                },
-                noteTemp: {}
+                }
             }
         },
         mounted() {
             let _this = this
-            if (_this.note._id) {
+            if (_this.note.id) {
                 _this.loadNote()
             }
         },
         methods: {
             loadNote() {
                 let _this = this
-                _this.$db.findOne({
-                    _id: _this.note._id
-                }, (err, docs) => {
-                    if (err) {
-                        _this.$message({
-                            type: 'error',
-                            message: '笔记加载失败：' + err
-                        })
-                    } else {
-                        _this.note = docs
-                        _this.noteTemp = JSON.parse(JSON.stringify(docs))
-                    }
-                })
+                _this.note = _this.$db.get('notes').find({
+                    id: _this.note.id
+                }).value()
             },
             editNote() {
                 let _this = this
@@ -61,44 +54,34 @@
                     })
                     return
                 }
-                if (_this.note._id) {
-                    _this.$db.update(_this.noteTemp, _this.note, {}, (err, num) => {
-                        if (err) {
-                            _this.$message({
-                                type: 'error',
-                                message: '修改笔记失败：' + err
-                            })
-                        } else {
-                            // 添加成功跳转到对应分类
-                            _this.$router.push({name: 'list', query: {type: _this.note.type, categoryId: _this.note.categoryId}})
-                            // _this.$message({
-                            //     type: 'success',
-                            //     message: '修改笔记成功'
-                            // })
-                        }
-                    })
+                if (_this.note.id) {
+                    _this.$db.get('notes').find({
+                        id: _this.note.id
+                    }).assign(_this.note).write()
                 } else {
+                    _this.note.state = _this.Constants.STATE.available
                     _this.note.time = new Date().getTime()
-                    _this.$db.insert(_this.note, (err, newDoc) => {
-                        if (err) {
-                            _this.$message({
-                                type: 'error',
-                                message: '添加笔记失败：' + err
-                            })
-                        } else {
-                            // 添加成功跳转到对应分类
-                            _this.$router.push({name: 'list', query: {type: _this.note.type, categoryId: _this.note.categoryId}})
-                            // _this.$message({
-                            //     type: 'success',
-                            //     message: '添加笔记成功'
-                            // })
-                        }
-                    })
+                    _this.note = _this.$db.get('notes').insert(_this.note).write()
                 }
+                // 添加到搜索引擎
+                electron.ipcRenderer.send('lunr', _this.note)
+                // 编辑成功跳转到对应分类
+                _this.goToList()
             },
-            cancelEdit() {
+            goToList() {
                 let _this = this
-                _this.$router.push({name: 'list', query: {type: _this.note.type, categoryId: _this.note.categoryId}})
+                let query = {}
+                if (_this.note.state !== _this.Constants.STATE.available) {
+                    query.state = _this.note.state
+                } else {
+                    query.categoryId = _this.note.categoryId
+                }
+                _this.$router.push({name: 'list', query: query})
+            },
+            copyNote() {
+                Clipboard.copyToClipboard(this.note.context).then(() => {
+                    this.$message.success('已复制内容')
+                })
             }
         }
     }
