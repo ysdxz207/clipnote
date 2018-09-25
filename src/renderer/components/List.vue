@@ -69,7 +69,7 @@
     export default {
         data() {
             return {
-                categoryId: this.$route.query.categoryId || this.Constants.ID.defaultCategoryId,
+                categoryId: this.$route.query.categoryId || null,
                 state: this.$route.query.state || this.Constants.STATE.available,
                 itemList: [],
                 results: [],
@@ -133,12 +133,18 @@
                 console.log(_this.categoryId, _this.state)
                 // 重置选中
                 _this.checkedNotes = []
+                // 查询所有数据
+                let collections = _this.$db.get('notes')
+                _this.itemList = collections.value()
+                _this.pageCount = collections.size().value()
+                _this.results = collections.sortBy('time').slice(start, end).cloneDeep().value().reverse()
+
                 let start = _this.pageSize * (_this.pageCurrent - 1)
                 let end = _this.pageSize * _this.pageCurrent
                 if (_this.keywords) {
                     let results = _this.seacher.search(_this.keywords).filter(o => {
-                        if (_this.state === _this.Constants.STATE.available) {
-                            return o.categoryId === _this.categoryId && _this.state === _this.Constants.STATE.available
+                        if (_this.categoryId !== null) {
+                            return o.categoryId === _this.categoryId && _this.state !== _this.Constants.STATE.recycle
                         } else {
                             return o.state === _this.state
                         }
@@ -147,17 +153,10 @@
                     _this.results = results.slice(start, end)
                 } else {
                     let queryInfo = {}
-                    if (_this.state === _this.Constants.STATE.available &&
-                        _this.categoryId !== _this.Constants.ID.defaultCategoryId) {
+                    if (_this.categoryId !== null) {
                         queryInfo.categoryId = _this.categoryId
                     }
                     queryInfo.state = _this.state
-                    let collections = _this.$db.get('notes')
-                    _this.itemList = collections.value()
-                    console.log(queryInfo)
-                    collections = collections.filter(queryInfo)
-                    _this.pageCount = collections.size().value()
-                    _this.results = collections.sortBy('time').slice(start, end).cloneDeep().value().reverse()
                 }
             },
             editNote(id) {

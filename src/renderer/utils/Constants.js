@@ -13,10 +13,7 @@ const NAME = {
 }
 
 const ID = {
-    defaultCategoryId: 'default_category_id',
-    favouriteId: 'favourite_id',
-    clipboardId: 'clipboard_id',
-    recycleId: 'recycle_id'
+    defaultCategoryId: 'default_category_id'
 }
 
 const STATE = {

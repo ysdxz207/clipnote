@@ -2,21 +2,21 @@
     <div class="sidebar">
         <div>
             <div class="item" :class="activeSidebar === Constants.STATE.recycle ? 'active' : ''"
-                 @click="showItemList(Constants.ID.recycleId)">
+                 @click="showItemList(Constants.STATE.recycle)">
                 <svg class="icon" aria-hidden="true">
                     <use xlink:href="#clipnote-icon-recycle"></use>
                 </svg>
                 <span class="title">回收站</span>
             </div>
             <div class="item" :class="activeSidebar === Constants.STATE.favourite ? 'active' : ''"
-                 @click="showItemList(Constants.ID.favouriteId)">
+                 @click="showItemList(Constants.STATE.favourite)">
                 <svg class="icon" aria-hidden="true">
                     <use xlink:href="#clipnote-icon-favourite"></use>
                 </svg>
                 <span class="title">收藏夹</span>
             </div>
             <div class="item" :class="activeSidebar === Constants.STATE.clipboard ? 'active' : ''">
-                <el-col :span="12" @click.native="showItemList(Constants.ID.clipboardId)">
+                <el-col :span="12" @click.native="showItemList(Constants.STATE.clipboard)">
                     <svg class="icon" aria-hidden="true">
                         <use xlink:href="#clipnote-icon-clipboard"></use>
                     </svg>
@@ -51,7 +51,7 @@
                 <li v-for="(o, index) in categoryList"
                     :key="index"
                     :class="(o.id === activeSidebar) ? 'active' : ''">
-                    <span class="name" @click="showItemList(o.id)">{{o.name}}</span>
+                    <span class="name" @click="showItemList(Constants.STATE.available, o.id)">{{o.name}}</span>
                     <span class="btn-delete"
                           @click="deleteCategory(o.id)"
                           v-if="o.id !== Constants.ID.defaultCategoryId">
@@ -77,7 +77,7 @@
         },
         watch: {
             '$route'(to, from) {
-                let state = this.$route.query.state
+                let state = this.$route.query.state || this.Constants.STATE.available
                 if (state === this.Constants.STATE.available) {
                     this.activeSidebar = this.$route.query.categoryId
                 } else {
@@ -92,9 +92,7 @@
             let _this = this
             _this.loadCategoryList()
             // 选中并加载全部笔记分类
-            _this.showItemList(_this.Constants.ID.defaultCategoryId)
-            // 选中第一个分类
-            _this.activeSidebar = _this.$route.query.categoryId
+            _this.showItemList(_this.Constants.STATE.available, _this.Constants.ID.defaultCategoryId)
             // 是否开启剪贴板收集功能
             setTimeout(_this.loadClipboardCollection(), 2000)
         },
@@ -134,11 +132,14 @@
                     _this.$router.push({name: 'list', query: {categoryId: newDoc.id}})
                 })
             },
-            showItemList(action) {
-                // string为分类，number为状态
-                let categoryId = typeof action === 'number' ? this.Constants.ID.defaultCategoryId : action
-                let state = typeof action === 'string' ? this.Constants.STATE.available : action
-                this.$router.push({name: 'list', query: {categoryId: categoryId, state: state}})
+            showItemList(state, categoryId) {
+                let query = {
+                    state
+                }
+                if (categoryId) {
+                    query.categoryId = categoryId
+                }
+                this.$router.push({name: 'list', query: query})
             },
             deleteCategory(id) {
                 let _this = this
