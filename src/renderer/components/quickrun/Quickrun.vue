@@ -119,7 +119,9 @@
                 if (!fs.existsSync(path)) {
                     path = eshortcut.target
                 }
+                path = '"' + path + '"'
                 path = eshortcut.args ? path + ' ' + eshortcut.args : path
+                console.log(path)
                 childProcess.exec('start ' + path, function (err, data) {
                     if (err) {
                         // dialog.showErrorBox('错误', '运行[' + eshortcut.name + ']失败了：' + err)
