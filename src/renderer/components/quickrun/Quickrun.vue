@@ -97,9 +97,7 @@
                 _this.shortcutList = _this.$db.get('shortcuts').sortBy('time').value()
             },
             checkEShortcutExists(name) {
-                console.log('是否存在', name)
                 let result = this.shortcutList.filter(x => x.name === name)
-                console.log('是否存在', result.length > 0)
                 if (result.length > 0) {
                     return true
                 }
@@ -133,6 +131,9 @@
                     let file = fileList[i]
                     let name = file.name
                     let path = file.path
+                    if (name.lastIndexOf('.') > 0) {
+                        name = name.substring(0, name.lastIndexOf('.'))
+                    }
 
                     // 检查是否已存在
                     if (_this.checkEShortcutExists(name)) {
