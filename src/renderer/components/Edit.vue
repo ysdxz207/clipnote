@@ -71,7 +71,7 @@
             goToList() {
                 let _this = this
                 let query = {}
-                if (_this.note.state !== _this.Constants.STATE.available) {
+                if (_this.note.state && _this.note.state !== _this.Constants.STATE.available) {
                     query.state = _this.note.state
                 } else {
                     query.categoryId = _this.note.categoryId

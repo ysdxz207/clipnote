@@ -158,7 +158,7 @@
                         categoryId: id
                     }).value()
                     noteList.forEach((o, index) => {
-                        o.categoryId = _this.Constants.ID.recycleId
+                        o.state = _this.Constants.STATE.recycle
                         _this.$db.get('categories').find({id: o.id}).assign(o).write()
                     })
                     // 删除分类完成回到默认分类下

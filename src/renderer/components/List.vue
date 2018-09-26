@@ -215,7 +215,7 @@
                     type: 'warning'
                 }).then(() => {
                     _this.checkedNotes.forEach((id) => {
-                        if (_this.categoryId === _this.Constants.ID.recycleId) {
+                        if (_this.state === _this.Constants.STATE.recycle) {
                             collections.remove({id: id}).write()
                         } else {
                             // 转移当前分类下内容到回收站
@@ -245,6 +245,11 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
+                    // 查询笔记的分类是否被删除
+                    if (item.categoryId && _this.$db.get('categories').find({id: item.categoryId}).isEmpty()) {
+                        _this.$alert('当前笔记所属分类已被删除，无法恢复。', '提示')
+                        return
+                    }
                     _this.$db.get('notes').find({id: item.id}).assign({state: _this.Constants.STATE.available}).write()
                     _this.loadItemList()
                 }).catch(() => {
