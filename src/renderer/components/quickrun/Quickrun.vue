@@ -90,6 +90,11 @@
                     editWindow.webContents.openDevTools()
                 }
 
+                editWindow.on('close', (e) => {
+                    e.preventDefault()
+                    editWindow.hide()
+                })
+
                 _this.editWindow = editWindow
             },
             loadQuickrunList() {

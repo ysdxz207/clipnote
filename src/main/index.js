@@ -65,8 +65,9 @@ function init() {
             webSecurity: false
         }
     }).create().object
-    quickrunWindow.on('closed', (e) => {
-        quickrunWindow = null
+    quickrunWindow.on('close', (e) => {
+        e.preventDefault()
+        quickrunWindow.hide()
     })
     quickrunWindow.on('minimize', (e) => {
         quickrunWindow.hide()
@@ -90,6 +91,10 @@ function init() {
     if (process.env.DEBUG === 'yes') {
         settingsWindow.openDevTools()
     }
+    settingsWindow.on('close', (e) => {
+        e.preventDefault()
+        settingsWindow.hide()
+    })
     // 注册快捷键
     Shortcut.registShortCut(mainWindow, 'toggleMain')
     Shortcut.registShortCut(quickrunWindow, 'toggleQuickrun')
