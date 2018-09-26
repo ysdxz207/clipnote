@@ -41,8 +41,7 @@ function init() {
         useContentSize: true,
         resizable: false,
         show: false,
-        alwaysOnTop: true,
-        transparent: true
+        alwaysOnTop: true
     }).create().object
 
     mainWindow.on('close', (e) => {
@@ -64,7 +63,6 @@ function init() {
         useContentSize: true,
         resizable: false,
         show: true,
-        transparent: true,
         alwaysOnTop: true,
         webPreferences: {
             webSecurity: false
