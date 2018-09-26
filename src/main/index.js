@@ -158,7 +158,7 @@ function registTray() {
             label: '退出',
             type: 'normal',
             click() {
-                app.quit()
+                app.exit()
             }
         }
     ])
@@ -192,14 +192,15 @@ const shouldQuit = app.makeSingleInstance((commandLine, workingDirectory) => {
 })
 
 if (shouldQuit) {
-    app.quit()
+    app.exit()
 }
 
 app.on('ready', init)
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-        app.quit()
+        // app.quit()
+        app.exit()
     }
 })
 
