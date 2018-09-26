@@ -78,7 +78,7 @@
         watch: {
             '$route'(to, from) {
                 let state = this.$route.query.state || this.Constants.STATE.available
-                if (state === this.Constants.STATE.available) {
+                if (state === this.Constants.STATE.available || this.$route.query.categoryId === this.Constants.ID.defaultCategoryId) {
                     this.activeSidebar = this.$route.query.categoryId
                 } else {
                     this.activeSidebar = state

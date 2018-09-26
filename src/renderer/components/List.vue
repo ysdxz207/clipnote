@@ -165,7 +165,7 @@
                 _this.results = results.slice(start, end)
             },
             editNote(id) {
-                this.$router.push({name: 'edit', query: {id: id, categoryId: this.categoryId}})
+                this.$router.push({name: 'edit', query: {id: id, categoryId: this.categoryId, state: this.state}})
             },
             deleteNote(note) {
                 let _this = this

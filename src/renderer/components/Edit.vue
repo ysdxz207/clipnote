@@ -71,10 +71,11 @@
             goToList() {
                 let _this = this
                 let query = {}
-                if (_this.note.state && _this.note.state !== _this.Constants.STATE.available) {
-                    query.state = _this.note.state
+                if (_this.$route.query.categoryId ||
+                    (_this.note.state === _this.Constants.STATE.available)) {
+                    query.categoryId = _this.$route.query.categoryId
                 } else {
-                    query.categoryId = _this.note.categoryId
+                    query.state = _this.note.state
                 }
                 _this.$router.push({name: 'list', query: query})
             },
