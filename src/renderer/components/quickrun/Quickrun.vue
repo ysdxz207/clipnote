@@ -119,10 +119,13 @@
                 if (!fs.existsSync(path)) {
                     path = eshortcut.target
                 }
-                path = '"' + path + '"'
+                path = '"" "' + path + '"'
                 path = eshortcut.args ? path + ' ' + eshortcut.args : path
-                console.log(path)
-                childProcess.exec('start ' + path, function (err, data) {
+                console.log(eshortcut)
+                childProcess.exec('start ' + path, {
+                    cwd: eshortcut.workingDir,
+                    windowsHide: true
+                }, function (err, data) {
                     if (err) {
                         // dialog.showErrorBox('错误', '运行[' + eshortcut.name + ']失败了：' + err)
                     }
@@ -151,16 +154,19 @@
                     eshortcut.id = process.hrtime().join('')
 
                     windowsShortcuts.query(path, function (a, o) {
+                        path = path && path.replace(/\\/gim, '/')
                         let args = o.args
                         let desc = o.desc
                         let hotkey = o.hotkey
                         let icon = o.icon
                         let target = o.target
-                        let workingDir = o.workingDir
-
+                        let workingDir = o.workingDir && o.workingDir.replace(/\\/gim, '/')
+                        if (!workingDir) {
+                            workingDir = path.substring(0, path.lastIndexOf('/'))
+                        }
                         eshortcut.name = name
                         eshortcut.path = path
-                        eshortcut.target = target
+                        eshortcut.target = target && target.replace(/\\/gim, '/')
                         eshortcut.icon = icon
                         eshortcut.args = args
                         eshortcut.hotkey = hotkey
