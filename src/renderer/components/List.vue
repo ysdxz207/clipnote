@@ -209,7 +209,7 @@
                     return
                 }
                 let collections = _this.$db.get('notes')
-                _this.$confirm('删除后将无法恢复,确定删笔记吗？', '提示', {
+                _this.$confirm('确定删笔记吗？', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
