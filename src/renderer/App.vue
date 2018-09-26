@@ -14,6 +14,7 @@
         mounted() {
             // 不允许放大缩小网页
             electron.webFrame.setVisualZoomLevelLimits(1, 1)
+            electron.webFrame.setLayoutZoomLevelLimits(1, 1)
         },
         methods: {
             hideWindow() {
