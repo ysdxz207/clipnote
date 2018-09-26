@@ -47,13 +47,13 @@
       ]
     },
     "mac": {
-      "icon": "build/icons/icon.icns"
+      "icon": "static/assets/icons/app/icon.icns"
     },
     "win": {
-      "icon": "build/icons/icon.ico"
+      "icon": "static/assets/icons/app/icon.ico"
     },
     "linux": {
-      "icon": "build/icons"
+      "icon": "static/assets/icons/app"
     }
   },
   "dependencies": {
