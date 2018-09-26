@@ -45,6 +45,11 @@ function init() {
         transparent: true
     }).create().object
 
+    mainWindow.on('close', (e) => {
+        e.preventDefault()
+        mainWindow.hide()
+    })
+
     mainWindow.on('closed', (e) => {
         mainWindow = null
     })
