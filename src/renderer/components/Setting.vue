@@ -40,6 +40,9 @@
                             <el-input size="mini" v-model="setting.hotkey.toggleQuickrun.key"></el-input>
                         </el-col>
                     </el-row>
+                    <el-row type="flex" justify="space-between">
+                        <el-checkbox v-model="setting.quickrun.runShow">启动显示主窗口</el-checkbox>
+                    </el-row>
                 </el-form-item>
             </el-form>
         </el-col>
@@ -99,6 +102,15 @@
                     } else {
                         _this.$message.error('快捷键可能已被占用')
                     }
+                }
+            })
+            _this.$watch('setting.quickrun', {
+                deep: true,
+                handler: function () {
+                    _this.$db.update('config', (o) => {
+                        console.log(_this.setting)
+                        return _this.setting
+                    }).write()
                 }
             })
         },

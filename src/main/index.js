@@ -22,6 +22,9 @@ if (process.env.NODE_ENV !== 'development') {
 let mainWindow, quickrunWindow, settingsWindow, tray
 const winURL = Constants.URL.index
 
+// 读取配置
+let conf = $db.get('config').value()
+
 const settingURL = winURL + '#/setting'
 const quickrunURL = winURL + '#/quickrun'
 
@@ -62,7 +65,7 @@ function init() {
         frame: false,
         useContentSize: true,
         resizable: false,
-        show: true,
+        show: conf.quickrun.runShow,
         alwaysOnTop: true,
         webPreferences: {
             webSecurity: false
@@ -106,8 +109,6 @@ function init() {
 }
 
 function registTray() {
-    // 读取配置
-    let conf = $db.get('config').value()
     tray = new Tray(ICON_PATH)
     const contextMenu = Menu.buildFromTemplate([
         {

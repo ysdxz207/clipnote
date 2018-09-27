@@ -41,6 +41,9 @@ db.defaults({
                 control: ['CmdOrCtrl', 'Shift'],
                 key: '`'
             }
+        },
+        quickrun: {
+            runShow: true
         }
     }
 }).write()
