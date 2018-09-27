@@ -68,7 +68,8 @@
                             control: [],
                             key: ''
                         }
-                    }
+                    },
+                    quickrun: {}
                 }
             }
         },

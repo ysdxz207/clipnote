@@ -246,7 +246,7 @@
                     type: 'warning'
                 }).then(() => {
                     // 查询笔记的分类是否被删除
-                    if (item.categoryId && _this.$db.get('categories').find({id: item.categoryId}).isEmpty()) {
+                    if (!item.categoryId && _this.$db.get('categories').find({id: item.categoryId}).value()) {
                         _this.$alert('当前笔记所属分类已被删除，无法恢复。', '提示')
                         return
                     }
