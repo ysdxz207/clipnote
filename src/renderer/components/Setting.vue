@@ -108,7 +108,6 @@
                 deep: true,
                 handler: function () {
                     _this.$db.update('config', (o) => {
-                        console.log(_this.setting)
                         return _this.setting
                     }).write()
                 }
