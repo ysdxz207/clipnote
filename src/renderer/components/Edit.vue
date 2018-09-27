@@ -13,6 +13,16 @@
                 <el-button type="default" @click="copyNote" plain size="mini">复制</el-button>
             </el-form-item>
             <el-form-item>
+                <el-select v-model="note.categoryId" filterable placeholder="请选择">
+                    <el-option
+                            v-for="item in categories"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
                 <el-button type="success" @click="editNote" size="mini">保存</el-button>
                 <el-button @click="goToList" size="mini">取消</el-button>
             </el-form-item>
@@ -24,12 +34,14 @@
     import electron from 'electron'
     import Clipboard from '../utils/Clipboard'
     export default {
+        components: {},
         data() {
             return {
                 note: {
                     id: this.$route.query.id,
                     categoryId: this.$route.query.categoryId
-                }
+                },
+                categories: []
             }
         },
         mounted() {
@@ -37,6 +49,8 @@
             if (_this.note.id) {
                 _this.loadNote()
             }
+            // 所有分类
+            _this.categories = _this.$db.get('categories').value()
         },
         methods: {
             loadNote() {

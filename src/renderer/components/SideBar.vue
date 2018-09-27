@@ -40,7 +40,7 @@
                     </svg>
                     <span class="title">分类</span>
                 </el-col>
-                <el-col :span="2" :push="8" @click.native="newCategory">
+                <el-col :span="2" :push="8" @click.native="editCategory">
                     <svg class="icon" aria-hidden="true">
                         <use xlink:href="#clipnote-icon-add"></use>
                     </svg>
@@ -52,10 +52,13 @@
                     :key="index"
                     :class="(o.id === activeSidebar) ? 'active' : ''">
                     <span class="name" @click="showItemList(null, o.id)">{{o.name}}</span>
-                    <span class="btn-delete"
-                          @click="deleteCategory(o.id)"
-                          v-if="o.id !== Constants.ID.defaultCategoryId">
-                        <svg class="icon" aria-hidden="true">
+                    <span class="btn-group">
+                        <svg class="icon" aria-hidden="true" @click="editCategory(o.id)"
+                             v-if="o.id !== Constants.ID.defaultCategoryId">
+                            <use xlink:href="#clipnote-icon-edit-category"></use>
+                        </svg>
+                        <svg class="icon" aria-hidden="true" @click="deleteCategory(o.id)"
+                             v-if="o.id !== Constants.ID.defaultCategoryId">
                             <use xlink:href="#clipnote-icon-delete1"></use>
                         </svg>
                     </span>
@@ -101,11 +104,17 @@
                 let _this = this
                 _this.categoryList = _this.$db.get('categories').filter({show: true}).sortBy('time').value().reverse()
             },
-            newCategory() {
+            editCategory(categoryId) {
                 let _this = this
+                let collections = _this.$db.get('categories')
+                let category
+                if (categoryId) {
+                    category = collections.find({id: categoryId}).value()
+                }
                 _this.$prompt('请输入分类名', '提示', {
                     confirmButtonText: '确定',
-                    cancelButtonText: '取消'
+                    cancelButtonText: '取消',
+                    inputValue: category && category.name
                 }).then(({value}) => {
                     if (!value) {
                         _this.$message({
@@ -121,15 +130,21 @@
                         })
                         return
                     }
-                    let doc = {
-                        show: true,
-                        name: value,
-                        time: new Date().getTime()
+                    if (categoryId) {
+                        category.name = value
+                        collections.assign(category).write()
+                    } else {
+                        category = {
+                            show: true,
+                            name: value,
+                            time: new Date().getTime()
+                        }
+                        let newDoc = collections.insert(category).write()
+                        categoryId = newDoc.categoryId
                     }
-                    let newDoc = _this.$db.get('categories').insert(doc).write()
                     _this.loadCategoryList()
                     // 新增分类成功跳转到当前分类列表
-                    _this.$router.push({name: 'list', query: {categoryId: newDoc.id}})
+                    _this.$router.push({name: 'list', query: {categoryId: categoryId}})
                 })
             },
             showItemList(state, categoryId) {
@@ -246,13 +261,12 @@
         display: inline-block;
         width: 70%;
         cursor: pointer;
-        float: left;
     }
 
-    .sidebar .btn-delete {
+    .sidebar .btn-group {
         display: inline-block;
-        float: right;
         margin-right: 10px;
         cursor: pointer;
+        float: right;
     }
 </style>
