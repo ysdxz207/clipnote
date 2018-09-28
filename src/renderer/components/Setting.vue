@@ -108,7 +108,9 @@
             _this.$watch('setting.quickrun', {
                 deep: true,
                 handler: function () {
+                    // 重新读取，以防覆盖其他值
                     _this.$db.read()
+                    // 部分修改，以防覆盖其他值
                     _this.$db.set('config.quickrun', _this.setting.quickrun).write()
                 }
             })

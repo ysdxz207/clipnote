@@ -53,7 +53,9 @@ shortcut.registShortCut = function(windowObj, key, value) {
     // 检查快捷键是否注册成功
     if (globalShortcut.isRegistered(hotkey)) {
         console.log('Shortcut registration sucess!')
+        // 重新读取，以防覆盖其他值
         $db.read()
+        // 部分修改，以防覆盖其他值
         $db.set('config.hotkey.' + key, value).write()
         return true
     }

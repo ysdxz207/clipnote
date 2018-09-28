@@ -146,7 +146,9 @@ function registTray() {
             type: 'checkbox',
             checked: conf.startup,
             click(menuItem) {
+                // 重新读取，以防覆盖其他值
                 $db.read()
+                // 部分修改，以防覆盖其他值
                 $db.set('config.startup', menuItem.checked).write()
                 toggleStartUp(menuItem.checked)
             }

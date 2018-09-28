@@ -193,7 +193,9 @@
                 _this.$watch('conf.clipboardCollection', {
                     deep: true,
                     handler: function () {
+                        // 重新读取，以防覆盖其他值
                         _this.$db.read()
+                        // 部分修改，以防覆盖其他值
                         _this.$db.set('config.clipboardCollection', _this.conf.clipboardCollection).write()
                         _this.bus.$emit('configChange', 'clipboardCollection')
                     }
