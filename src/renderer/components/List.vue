@@ -24,7 +24,7 @@
                             <i class="element-icons clipnote-icon-favourite"
                                :style="item.state === Constants.STATE.favourite ? 'color: yellow' : 'color: grey'"></i>
                         </span>
-                        <span class="btn-list-operation" v-if="item.state === Constants.STATE.recycle" title="恢复笔记" @click="revertNote(item)">
+                        <span class="btn-list-operation" v-if="item.state === Constants.STATE.recycle" :title="item.categoryId ? '恢复笔记' : '粘贴板笔记无法恢复'" @click="revertNote(item)">
                             <svg class="icon" aria-hidden="true" v-if="item.categoryId">
                                 <use xlink:href="#clipnote-icon-revert"></use>
                             </svg>
