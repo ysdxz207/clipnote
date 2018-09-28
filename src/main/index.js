@@ -23,7 +23,7 @@ let mainWindow, quickrunWindow, settingsWindow, tray
 const winURL = Constants.URL.index
 
 // 读取配置
-let conf = $db.get('config').value()
+let conf = $db.get('config').cloneDeep().value()
 
 const settingURL = winURL + '#/setting'
 const quickrunURL = winURL + '#/quickrun'

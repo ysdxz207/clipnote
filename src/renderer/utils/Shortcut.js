@@ -4,7 +4,7 @@ const globalShortcut = (electron.globalShortcut || electron.remote.globalShortcu
 let shortcut = {}
 
 shortcut.registShortCut = function(windowObj, key, conf) {
-    let confOld = $db.get('config').value()
+    let confOld = $db.get('config').cloneDeep().value()
     if (!conf || !conf.hotkey) {
         conf = confOld
     }

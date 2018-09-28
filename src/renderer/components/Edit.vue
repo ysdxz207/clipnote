@@ -13,16 +13,6 @@
                 <el-button type="default" @click="copyNote" plain size="mini">复制</el-button>
             </el-form-item>
             <el-form-item>
-                <el-select v-model="note.categoryId" filterable placeholder="请选择">
-                    <el-option
-                            v-for="item in categories"
-                            :key="item.id"
-                            :label="item.name"
-                            :value="item.id">
-                    </el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item>
                 <el-button type="success" @click="editNote" size="mini">保存</el-button>
                 <el-button @click="goToList" size="mini">取消</el-button>
             </el-form-item>
@@ -50,14 +40,14 @@
                 _this.loadNote()
             }
             // 所有分类
-            _this.categories = _this.$db.get('categories').value()
+            _this.categories = _this.$db.get('categories').sortBy('time').cloneDeep().value().reverse().filter((o) => o.id !== _this.Constants.ID.defaultCategoryId)
         },
         methods: {
             loadNote() {
                 let _this = this
                 _this.note = _this.$db.get('notes').find({
                     id: _this.note.id
-                }).value()
+                }).cloneDeep().value()
             },
             editNote() {
                 let _this = this

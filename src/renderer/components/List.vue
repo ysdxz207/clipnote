@@ -219,7 +219,7 @@
                             collections.remove({id: id}).write()
                         } else {
                             // 转移当前分类下内容到回收站
-                            let note = collections.find({id: id}).value()
+                            let note = collections.find({id: id}).cloneDeep().value()
                             note.state = _this.Constants.STATE.recycle
                             collections.assign(note).write()
                         }

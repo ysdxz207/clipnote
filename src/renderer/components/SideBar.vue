@@ -102,14 +102,15 @@
         methods: {
             loadCategoryList() {
                 let _this = this
-                _this.categoryList = _this.$db.get('categories').filter({show: true}).sortBy('time').value().reverse()
+                _this.categoryList = _this.$db.get('categories').filter({show: true}).sortBy('time').cloneDeep().value().reverse()
             },
             editCategory(categoryId) {
                 let _this = this
                 let collections = _this.$db.get('categories')
+                let isNew = !!categoryId
                 let category
-                if (categoryId) {
-                    category = collections.find({id: categoryId}).value()
+                if (isNew) {
+                    category = collections.find({id: categoryId}).cloneDeep().value()
                 }
                 _this.$prompt('请输入分类名', '提示', {
                     confirmButtonText: '确定',
@@ -130,7 +131,7 @@
                         })
                         return
                     }
-                    if (categoryId) {
+                    if (!isNew) {
                         category.name = value
                         collections.assign(category).write()
                     } else {
@@ -145,6 +146,8 @@
                     _this.loadCategoryList()
                     // 新增分类成功跳转到当前分类列表
                     _this.$router.push({name: 'list', query: {categoryId: categoryId}})
+                }).catch(e => {
+                    console.log('cancel')
                 })
             },
             showItemList(state, categoryId) {
@@ -186,7 +189,7 @@
             },
             loadClipboardCollection() {
                 let _this = this
-                _this.conf = _this.$db.get('config').value()
+                _this.conf = _this.$db.get('config').cloneDeep().value()
                 _this.$watch('conf.clipboardCollection', {
                     deep: true,
                     handler: function () {

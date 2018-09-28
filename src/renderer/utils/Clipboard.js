@@ -6,7 +6,7 @@ const clip = {}
 let copyAction = false
 
 clip.watchOrUnWatch = function (callback) {
-    let config = $db.get('config').value()
+    let config = $db.get('config').cloneDeep().value()
     clipboard.off('text-changed')
     clipboard.off('image-changed')
     clipboard.stopWatching()
