@@ -3,15 +3,14 @@ const electron = require('electron')
 const globalShortcut = (electron.globalShortcut || electron.remote.globalShortcut)
 let shortcut = {}
 
-shortcut.registShortCut = function(windowObj, key, conf) {
+shortcut.registShortCut = function(windowObj, key, value) {
     let confOld = $db.get('config').cloneDeep().value()
-    if (!conf || !conf.hotkey) {
-        conf = confOld
+    if (!value) {
+        value = confOld.hotkey[key]
     }
-    console.log('注册快捷键前获取配置', confOld, conf)
-    let hotkeysControl = conf.hotkey[key].control
+    let hotkeysControl = value.control
     let hotkeysControlOld = confOld.hotkey[key].control
-    let hotkeysKey = conf.hotkey[key].key
+    let hotkeysKey = value.key
     let hotkeysKeyOld = confOld.hotkey[key].key
     let hotkey = ''
     let hotkeyOld = ''
@@ -54,9 +53,8 @@ shortcut.registShortCut = function(windowObj, key, conf) {
     // 检查快捷键是否注册成功
     if (globalShortcut.isRegistered(hotkey)) {
         console.log('Shortcut registration sucess!')
-        $db.update('config', (o) => {
-            return conf
-        }).write()
+        $db.read()
+        $db.set('config.hotkey.' + key, value).write()
         return true
     }
 }

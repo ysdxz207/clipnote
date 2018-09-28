@@ -82,7 +82,7 @@
                     console.log('-----------------')
                     let windowObj = electron.remote.getCurrentWindow().getParentWindow()
                     if (Shortcut.registShortCut(windowObj,
-                        'toggleMain', _this.setting)) {
+                        'toggleMain', _this.setting.hotkey.toggleMain)) {
                     } else {
                         _this.$message({
                             type: 'error',
@@ -99,7 +99,7 @@
                     let windowObj = windowManager.get(_this.Constants.NAME.QUICKRUN).object
                     console.log('quickru window', windowObj)
                     if (Shortcut.registShortCut(windowObj,
-                        'toggleQuickrun', _this.setting)) {
+                        'toggleQuickrun', _this.setting.hotkey.toggleQuickrun)) {
                     } else {
                         _this.$message.error('快捷键可能已被占用')
                     }
@@ -108,9 +108,8 @@
             _this.$watch('setting.quickrun', {
                 deep: true,
                 handler: function () {
-                    _this.$db.update('config', (o) => {
-                        return _this.setting
-                    }).write()
+                    _this.$db.read()
+                    _this.$db.set('config.quickrun', _this.setting.quickrun).write()
                 }
             })
         },

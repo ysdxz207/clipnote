@@ -144,12 +144,10 @@ function registTray() {
         {
             label: '开机启动',
             type: 'checkbox',
-            checked: conf['startup'],
+            checked: conf.startup,
             click(menuItem) {
-                conf['startup'] = menuItem.checked
-                $db.update('config', (o) => {
-                    return conf
-                }).write()
+                $db.read()
+                $db.set('config.startup', menuItem.checked).write()
                 toggleStartUp(menuItem.checked)
             }
         },

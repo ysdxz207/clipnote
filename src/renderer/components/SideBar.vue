@@ -97,7 +97,7 @@
             // 选中并加载全部笔记分类
             _this.showItemList(null, _this.Constants.ID.defaultCategoryId)
             // 是否开启剪贴板收集功能
-            setTimeout(_this.loadClipboardCollection(), 2000)
+            _this.loadClipboardCollection()
         },
         methods: {
             loadCategoryList() {
@@ -193,9 +193,8 @@
                 _this.$watch('conf.clipboardCollection', {
                     deep: true,
                     handler: function () {
-                        _this.$db.update('config', (o) => {
-                            return _this.conf
-                        }).write()
+                        _this.$db.read()
+                        _this.$db.set('config.clipboardCollection', _this.conf.clipboardCollection).write()
                         _this.bus.$emit('configChange', 'clipboardCollection')
                     }
                 })
