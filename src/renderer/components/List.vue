@@ -71,6 +71,7 @@
 </template>
 
 <script>
+    import electron from 'electron'
     import FuzzySearch from 'fuzzy-search'
     import Clipboard from '../utils/Clipboard'
     const Mousetrap = require('mousetrap')
@@ -134,6 +135,12 @@
                 _this.deleteNoteBatch()
                 // 返回 false 以防止默认行为，并阻止事件冒泡
                 return false
+            })
+            // 刷新列表
+            electron.ipcRenderer.on('refreshList', () => {
+                if (_this.$route.query.state === _this.Constants.STATE.clipboard) {
+                    _this.loadItemList()
+                }
             })
         },
         methods: {

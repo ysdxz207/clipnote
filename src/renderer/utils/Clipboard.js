@@ -1,5 +1,6 @@
 import $db from './db'
 import Constants from './Constants'
+import electron from 'electron'
 const clipboard = require('electron-clipboard-extended')
 
 const clip = {}
@@ -29,6 +30,8 @@ clip.watchOrUnWatch = function (callback) {
                 title: currentText.substring(0, 20),
                 time: new Date().getTime()
             }).write()
+            // 刷新列表
+            electron.remote.getCurrentWindow().webContents.send('refreshList')
         })
         .on('image-changed', () => {
             let currentIMage = clipboard.readImage()
