@@ -33,14 +33,8 @@ db.defaults({
         startup: false,
         clipboardCollection: true,
         hotkey: {
-            toggleMain: {
-                control: ['CmdOrCtrl'],
-                key: '`'
-            },
-            toggleQuickrun: {
-                control: ['CmdOrCtrl', 'Shift'],
-                key: '`'
-            }
+            toggleMain: 'CmdOrCtrl+`',
+            toggleQuickrun: 'CmdOrCtrl+Sift+`'
         },
         quickrun: {
             runShow: true

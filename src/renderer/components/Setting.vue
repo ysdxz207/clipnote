@@ -3,21 +3,11 @@
         <el-col :span="12">
             <el-form label-width="80px">
                 <el-form-item label="笔记：">
-                    <el-row type="flex" justify="space-between">
-                        <el-col>
-                            <el-checkbox-group v-model="setting.hotkey.toggleMain.control">
-                                <el-checkbox label="CmdOrCtrl"></el-checkbox>
-                                <el-checkbox label="Shift"></el-checkbox>
-                                <el-checkbox label="Alt"></el-checkbox>
-                            </el-checkbox-group>
-                        </el-col>
-                        <el-col style="text-align: center">
-                            +
-                        </el-col>
-                        <el-col>
-                            <el-input size="mini" v-model="setting.hotkey.toggleMain.key"></el-input>
-                        </el-col>
-                    </el-row>
+                    <el-input :value="setting.hotkey.toggleQuickrun"
+                              @keydown.native="keyup(setting.hotkey.toggleQuickrun, $event)"
+                              size="mini"
+                              @blur="onBlur()"
+                    ></el-input>
                 </el-form-item>
             </el-form>
 
@@ -26,19 +16,7 @@
             <el-form label-width="80px">
                 <el-form-item label="quickrun:">
                     <el-row type="flex" justify="space-between">
-                        <el-col>
-                            <el-checkbox-group v-model="setting.hotkey.toggleQuickrun.control">
-                                <el-checkbox label="CmdOrCtrl"></el-checkbox>
-                                <el-checkbox label="Shift"></el-checkbox>
-                                <el-checkbox label="Alt"></el-checkbox>
-                            </el-checkbox-group>
-                        </el-col>
-                        <el-col style="text-align: center">
-                            +
-                        </el-col>
-                        <el-col>
-                            <el-input size="mini" v-model="setting.hotkey.toggleQuickrun.key"></el-input>
-                        </el-col>
+
                     </el-row>
                     <el-row type="flex" justify="space-between">
                         <el-checkbox v-model="setting.quickrun.runShow">启动显示主窗口</el-checkbox>
@@ -52,6 +30,7 @@
 <script>
     import Shortcut from '../utils/Shortcut'
     import electron from 'electron'
+    // import {mapGetters} from 'vuex'
 
     const windowManager = electron.remote.require('electron-window-manager')
 
@@ -59,19 +38,13 @@
         data() {
             return {
                 setting: {
-                    hotkey: {
-                        toggleMain: {
-                            control: [],
-                            key: ''
-                        },
-                        toggleQuickrun: {
-                            control: [],
-                            key: ''
-                        }
-                    },
+                    hotkey: {},
                     quickrun: {}
                 }
             }
+        },
+        computed: {
+            // ...mapGetters('hot-key', ['availableKeyCode', 'keyCode2RegisterKey'])
         },
         mounted() {
             let _this = this
@@ -96,13 +69,6 @@
                 deep: true,
                 handler: function () {
                     console.log('============')
-                    let windowObj = windowManager.get(_this.Constants.NAME.QUICKRUN).object
-                    console.log('quickru window', windowObj)
-                    if (Shortcut.registShortCut(windowObj,
-                        'toggleQuickrun', _this.setting.hotkey.toggleQuickrun)) {
-                    } else {
-                        _this.$message.error('快捷键可能已被占用')
-                    }
                 }
             })
             _this.$watch('setting.quickrun', {
@@ -115,7 +81,44 @@
                 }
             })
         },
-        methods: {}
+        methods: {
+            keyup(key, event) {
+                console.log(event)
+                event.preventDefault()
+                let rs
+                if (event.keyCode === 0) { // 删除键 直接清空
+                    rs = ''
+                } else {
+                    let comboKey = []
+                    if (event.shiftKey) {
+                        comboKey.push('Shift')
+                    }
+                    if (event.altKey) {
+                        comboKey.push('Alt')
+                    }
+                    if (event.metaKey) {
+                        comboKey.push('Command')
+                    }
+                    if (event.ctrlKey) {
+                        comboKey.push('Control')
+                    }
+                    comboKey.push(event.key)
+                    rs = Array.from(new Set(comboKey)).join('+')
+                }
+
+                this.setting.hotkey.toggleQuickrun = rs
+            },
+            onBlur() {
+                let _this = this
+                let windowObj = windowManager.get(_this.Constants.NAME.QUICKRUN).object
+                console.log('quickru window', windowObj)
+                if (Shortcut.registShortCut(windowObj,
+                    'toggleQuickrun', _this.setting.hotkey.toggleQuickrun)) {
+                } else {
+                    _this.$message.error('快捷键可能已被占用')
+                }
+            }
+        }
     }
 </script>
 

@@ -8,27 +8,11 @@ shortcut.registShortCut = function(windowObj, key, value) {
     if (!value) {
         value = confOld.hotkey[key]
     }
-    let hotkeysControl = value.control
-    let hotkeysControlOld = confOld.hotkey[key].control
-    let hotkeysKey = value.key
-    let hotkeysKeyOld = confOld.hotkey[key].key
-    let hotkey = ''
-    let hotkeyOld = ''
-    hotkeysControl.forEach((o, index) => {
-        if (o) {
-            hotkey += o + '+'
-        }
-    })
-    hotkeysControlOld.forEach((o, index) => {
-        if (o) {
-            hotkeyOld += o + '+'
-        }
-    })
+    let hotkey = value
+    let hotkeyOld = confOld.hotkey[key]
     if (!hotkey) {
         return false
     }
-    hotkey += hotkeysKey
-    hotkeyOld += hotkeysKeyOld
     console.log('注册快捷键：' + hotkey)
     // 注册全局快捷键
     if (hotkeyOld) {
