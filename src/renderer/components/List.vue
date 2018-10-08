@@ -138,7 +138,8 @@
             })
             // 刷新列表
             electron.ipcRenderer.on('refreshList', () => {
-                if (_this.$route.query.state === _this.Constants.STATE.clipboard) {
+                if (_this.$route.query.state === _this.Constants.STATE.clipboard ||
+                _this.$route.query.categoryId === _this.Constants.ID.defaultCategoryId) {
                     _this.loadItemList()
                 }
             })
