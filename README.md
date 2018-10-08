@@ -47,3 +47,5 @@ Show or hide quickrun window:Ctr + Shift + \`
 
 4.↑ or ↓ to select shortcut and press 'Delete' to delete.
 
+
+[download](https://gitee.com/hupubao/clipnote/releases)
