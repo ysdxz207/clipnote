@@ -1,5 +1,5 @@
 <template>
-    <el-container style="height: 100%">
+    <el-container class="container-main">
         <el-aside width="200px">
             <side-bar></side-bar>
         </el-aside>
@@ -11,6 +11,7 @@
                 <router-view></router-view>
             </el-main>
         </el-container>
+        <canvas id="canvas_background"></canvas>
     </el-container>
 </template>
 
@@ -37,16 +38,37 @@
         mounted() {
             // 读取配置监听收集剪贴板
             Clipboard.watchOrUnWatch()
+            this.setCanvasBackground()
         },
         methods: {
             open(link) {
                 this.$electron.shell.openExternal(link)
+            },
+            setCanvasBackground() {
+                let canvas = document.querySelector('#canvas_background')
+                let context = canvas.getContext('2d')
+
+                canvas.width = window.innerWidth
+                canvas.height = window.innerHeight
+
+                let img = new Image()
+                img.src = '../../../static/assets/images/bg_home.png'
+                img.onload = drawImg
+
+                function drawImg() {
+                    context.drawImage(img, 0, 0, canvas.width, canvas.height)
+                }
             }
         }
     }
 </script>
 
 <style lang="scss">
+
+    .container-main {
+        position: relative;
+        height: 100%;
+    }
 
     .el-header {
         padding: 0;
@@ -56,5 +78,12 @@
         padding: 24px 14px;
         background-color: #F8F8F8;
         height: 100%;
+    }
+
+    #canvas_background {
+        position: absolute;
+        z-index: 2;
+        pointer-events: none;
+        opacity: 0.22;
     }
 </style>
