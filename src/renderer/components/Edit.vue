@@ -7,7 +7,7 @@
             <el-form-item>
                 <el-input type="textarea"
                           v-model="note.context"
-                          rows="12" placeholder="请输入笔记内容"></el-input>
+                          rows="11" placeholder="请输入笔记内容"></el-input>
             </el-form-item>
             <el-form-item>
                 <el-button type="default" @click="copyNote" plain size="mini">复制</el-button>
