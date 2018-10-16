@@ -52,7 +52,7 @@
                 canvas.height = window.innerHeight
 
                 let img = new Image()
-                img.src = '../../../static/assets/images/bg_home.png'
+                img.src = '../../../static/assets/images/bg_main.png'
                 img.onload = drawImg
 
                 function drawImg() {
@@ -85,5 +85,6 @@
         z-index: 2;
         pointer-events: none;
         opacity: 0.22;
+        filter: contrast(60%);
     }
 </style>
