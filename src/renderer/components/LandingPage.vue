@@ -52,7 +52,7 @@
                 canvas.height = window.innerHeight
 
                 let img = new Image()
-                img.src = '../../../static/assets/images/bg_main.png'
+                img.src = require('../../../static/assets/images/bg_main.png')
                 img.onload = drawImg
 
                 function drawImg() {
