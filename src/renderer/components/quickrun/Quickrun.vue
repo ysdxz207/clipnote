@@ -7,7 +7,7 @@
                 <img :src="shortcut.icon" height="18"/>{{shortcut.name}}
             </li>
         </ul>
-        <canvas id="canvas_background"></canvas>
+        <canvas id="canvas_background_quickrun"></canvas>
     </div>
 </template>
 
@@ -279,7 +279,7 @@
                 }
             },
             setCanvasBackground() {
-                let canvas = document.querySelector('#canvas_background')
+                let canvas = document.querySelector('#canvas_background_quickrun')
                 let context = canvas.getContext('2d')
 
                 canvas.width = window.innerWidth
@@ -290,7 +290,7 @@
                 img.onload = drawImg
 
                 function drawImg() {
-                    context.drawImage(img, 40, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height)
+                    context.drawImage(img, 340, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height)
                 }
             }
         }
@@ -327,19 +327,21 @@
     }
 
     li.selected {
-        background-color: #00AA58;
+        background-color: #00d36d;
     }
 
     li:hover {
-        background-color: #63AA7B;
+        background-color: #25f7ff;
     }
 
-    #canvas_background {
+    #canvas_background_quickrun {
         position: absolute;
+        top: 0;
+        left: 0;
         z-index: 2;
         pointer-events: none;
         opacity: 0.32;
-        filter: contrast(46%);
+        filter: contrast(66%);
     }
 
 </style>
