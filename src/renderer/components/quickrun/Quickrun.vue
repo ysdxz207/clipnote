@@ -1,11 +1,14 @@
 <template>
-    <ul class="quickrun-ul">
-        <li v-for="(shortcut, index) in shortcutList"
-            :key="index" @mousedown="shortcutMouseDown($event, shortcut)"
-            :title="shortcut.name">
-            <img :src="shortcut.icon" height="18"/>{{shortcut.name}}
-        </li>
-    </ul>
+    <div>
+        <ul class="quickrun-ul">
+            <li v-for="(shortcut, index) in shortcutList"
+                :key="index" @mousedown="shortcutMouseDown($event, shortcut)"
+                :title="shortcut.name">
+                <img :src="shortcut.icon" height="18"/>{{shortcut.name}}
+            </li>
+        </ul>
+        <canvas id="canvas_background"></canvas>
+    </div>
 </template>
 
 <script>
@@ -31,6 +34,7 @@
         },
         mounted() {
             let _this = this
+            this.setCanvasBackground()
             // 阻止浏览器默认行为
             document.addEventListener('drop', function (e) {
                 e.preventDefault()
@@ -273,6 +277,21 @@
                         _this.delete(_this.shortcutList[index])
                     }
                 }
+            },
+            setCanvasBackground() {
+                let canvas = document.querySelector('#canvas_background')
+                let context = canvas.getContext('2d')
+
+                canvas.width = window.innerWidth
+                canvas.height = window.innerHeight
+
+                let img = new Image()
+                img.src = require('/static/assets/images/bg_main.jpg')
+                img.onload = drawImg
+
+                function drawImg() {
+                    context.drawImage(img, 40, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height)
+                }
             }
         }
     }
@@ -283,7 +302,7 @@
         margin: 0;
         padding: 0;
         height: 100vh;
-        background-color: #e0ffdc;
+        /*background-color: #e0ffdc;*/
         list-style: none;
         /*禁止浏览器选择文本,防止双击选中文本*/
         -webkit-touch-callout: none;
@@ -308,11 +327,19 @@
     }
 
     li.selected {
-        background-color: #47e2ff;
+        background-color: #00AA58;
     }
 
     li:hover {
-        background-color: #a2f2ff;
+        background-color: #63AA7B;
+    }
+
+    #canvas_background {
+        position: absolute;
+        z-index: 2;
+        pointer-events: none;
+        opacity: 0.32;
+        filter: contrast(46%);
     }
 
 </style>
