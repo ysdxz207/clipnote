@@ -207,6 +207,18 @@
                     selectedList[index].classList.add('selected')
                 }
             },
+            scrollFollow(direction) {
+                if (direction > 0) {
+                    let el = document.querySelector('.quickrun-ul')
+                    let liHeight = el.querySelector('li').offsetHeight
+                    let scrollTop = el.scrollTop
+                    if (scrollTop > 0) {
+                        el.scrollTop = (scrollTop - liHeight) < 0 ? 0 : scrollTop - liHeight
+                    } else {
+                        el.scrollTop = scrollTop + liHeight
+                    }
+                }
+            },
             shortcutMouseDown(e, shortcut) {
                 let _this = this
                 if (e.button === 0) {
@@ -246,6 +258,7 @@
                         index = liList.length
                     }
                     _this.setSelected(index - 1)
+                    _this.scrollFollow(1)
                     break
 
                 case 40:
@@ -255,6 +268,7 @@
                         index = -1
                     }
                     _this.setSelected(index + 1)
+                    _this.scrollFollow(-1)
                     break
 
                     // ESC
