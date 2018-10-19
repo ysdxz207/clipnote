@@ -344,4 +344,8 @@
         filter: contrast(66%);
     }
 
+    .quickrun-ul {
+        overflow: scroll;
+    }
+
 </style>
