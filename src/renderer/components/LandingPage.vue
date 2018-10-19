@@ -84,7 +84,7 @@
         position: absolute;
         z-index: 2;
         pointer-events: none;
-        opacity: 0.42;
-        filter: contrast(66%);
+        opacity: 0.32;
+        filter: contrast(46%);
     }
 </style>
