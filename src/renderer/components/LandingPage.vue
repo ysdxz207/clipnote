@@ -52,11 +52,11 @@
                 canvas.height = window.innerHeight
 
                 let img = new Image()
-                img.src = require('../../../static/assets/images/bg_main.png')
+                img.src = require('../../../static/assets/images/bg_main.jpg')
                 img.onload = drawImg
 
                 function drawImg() {
-                    context.drawImage(img, 0, 0, canvas.width, canvas.height)
+                    context.drawImage(img, 40, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height)
                 }
             }
         }
@@ -84,7 +84,7 @@
         position: absolute;
         z-index: 2;
         pointer-events: none;
-        opacity: 0.22;
-        filter: contrast(60%);
+        opacity: 0.42;
+        filter: contrast(66%);
     }
 </style>
