@@ -208,16 +208,37 @@
                 }
             },
             scrollFollow(direction) {
+                let _this = this
+                let el = document.querySelector('.quickrun-ul')
+                let elLi = el.querySelector('li.selected')
+                let elLiArr = el.querySelectorAll('li')
+                let liHeight = elLi.offsetHeight
+                let scrollTop = el.scrollTop
+                let changedScrollTop = scrollTop
                 if (direction > 0) {
-                    let el = document.querySelector('.quickrun-ul')
-                    let liHeight = el.querySelector('li').offsetHeight
-                    let scrollTop = el.scrollTop
-                    if (scrollTop > 0) {
-                        el.scrollTop = (scrollTop - liHeight) < 0 ? 0 : scrollTop - liHeight
-                    } else {
-                        el.scrollTop = scrollTop + liHeight
+                    // 向上
+                    if (elLi.offsetTop <= scrollTop + elLi.offsetHeight) {
+                        changedScrollTop = (scrollTop - liHeight) < 0 ? 0 : scrollTop - liHeight
+                    }
+                } else {
+                    // 向下
+                    if (elLi.offsetTop + liHeight >= el.offsetHeight) {
+                        changedScrollTop = scrollTop + liHeight
                     }
                 }
+                // 末尾
+                if (elLi === elLiArr[elLiArr.length - 1]) {
+                    changedScrollTop = 0
+                    // 选中第一个
+                    _this.setSelected(0)
+                }
+                // 第一个
+                if (elLi === elLiArr[0]) {
+                    // changedScrollTop = 0
+                    // 选中最后一个
+                    // _this.setSelected(elLiArr.length - 1)
+                }
+                el.scrollTop = changedScrollTop
             },
             shortcutMouseDown(e, shortcut) {
                 let _this = this
