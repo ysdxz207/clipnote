@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="quickrun-main">
         <ul class="quickrun-ul">
             <li v-for="(shortcut, index) in shortcutList"
                 :key="index" @mousedown="shortcutMouseDown($event, shortcut)"
@@ -207,7 +207,7 @@
                     selectedList[index].classList.add('selected')
                 }
             },
-            scrollFollow(direction) {
+            scrollFollow(index, direction) {
                 let _this = this
                 let el = document.querySelector('.quickrun-ul')
                 let elLi = el.querySelector('li.selected')
@@ -227,16 +227,16 @@
                     }
                 }
                 // 末尾
-                if (elLi === elLiArr[elLiArr.length - 1]) {
+                if (direction < 0 && index === 0) {
                     changedScrollTop = 0
                     // 选中第一个
                     _this.setSelected(0)
                 }
                 // 第一个
-                if (elLi === elLiArr[0]) {
-                    // changedScrollTop = 0
+                if (direction > 0 && index === elLiArr.length - 1) {
                     // 选中最后一个
-                    // _this.setSelected(elLiArr.length - 1)
+                    _this.setSelected(elLiArr.length - 1)
+                    el.scrollTo(0, el.clientHeight)
                 }
                 el.scrollTop = changedScrollTop
             },
@@ -279,7 +279,7 @@
                         index = liList.length
                     }
                     _this.setSelected(index - 1)
-                    _this.scrollFollow(1)
+                    _this.scrollFollow(index - 1, 1)
                     break
 
                 case 40:
@@ -289,7 +289,7 @@
                         index = -1
                     }
                     _this.setSelected(index + 1)
-                    _this.scrollFollow(-1)
+                    _this.scrollFollow(index + 1, -1)
                     break
 
                     // ESC
@@ -355,8 +355,6 @@
         cursor: pointer;
         padding-left: 2px;
         overflow: hidden;
-        -ms-text-overflow: ellipsis; /*省略号*/
-        text-overflow: ellipsis; /*省略号*/
         font-size: 18px;
         white-space: nowrap; /*强制不换行*/
     }
@@ -379,7 +377,16 @@
         filter: contrast(66%);
     }
 
+    .quickrun-main {
+        position: absolute;
+        top: 30px;
+        left: 0;
+        bottom: 0;
+        width: 99.9%
+    }
+
     .quickrun-ul {
+        height: 100%;
         overflow: scroll;
     }
 
