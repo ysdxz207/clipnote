@@ -236,7 +236,7 @@
                 if (direction > 0 && index === elLiArr.length - 1) {
                     // 选中最后一个
                     _this.setSelected(elLiArr.length - 1)
-                    el.scrollTo(0, el.clientHeight)
+                    changedScrollTop = el.scrollHeight - el.offsetHeight + 4
                 }
                 el.scrollTop = changedScrollTop
             },
@@ -275,7 +275,7 @@
                     // 屏蔽上向键
                     e.preventDefault()
 
-                    if (index === 0) {
+                    if (index <= 0) {
                         index = liList.length
                     }
                     _this.setSelected(index - 1)
