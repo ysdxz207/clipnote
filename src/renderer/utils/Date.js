@@ -2,22 +2,24 @@ let dateUtils = {}
 dateUtils.formatDate = function formatDate(date, fmt) {
     if (/(y+)/.test(fmt)) {
         fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
-    } else {
-        fmt = 'yyyy-MM-dd HH:mm:ss'
     }
     let o = {
-        'M+': date.getMonth() + 1, // 月份
-        'd+': date.getDate(), // 日
-        'H+': date.getHours(), // 小时
-        'm+': date.getMinutes(), // 分
-        's+': date.getSeconds(), // 秒
-        'q+': Math.floor((date.getMonth() + 3) / 3), // 季度
-        'S': date.getMilliseconds() // 毫秒
+        'M+': date.getMonth() + 1,
+        'd+': date.getDate(),
+        'H+': date.getHours(),
+        'm+': date.getMinutes(),
+        's+': date.getSeconds()
     }
-    if (/(y+)/.test(fmt)) { fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length)) }
     for (let k in o) {
-        if (new RegExp('(' + k + ')').test(fmt)) { fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k]) : (('00' + o[k]).substr(('' + o[k]).length))) }
+        if (new RegExp(`(${k})`).test(fmt)) {
+            let str = o[k] + ''
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : padLeftZero(str))
+        }
     }
     return fmt
 }
+function padLeftZero(str) {
+    return ('00' + str).substr(str.length)
+}
+
 export default dateUtils
