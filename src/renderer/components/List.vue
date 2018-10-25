@@ -354,4 +354,8 @@
         width: 20px;
         height: 20px;
     }
+    /deep/ .el-checkbox {
+        color: #3c3c3c;
+        font-weight: bold;
+    }
 </style>
