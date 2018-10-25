@@ -2,9 +2,8 @@
     <transition enter-active-class="bounceIn" leave-active-class="zoomOutTop">
         <el-form ref="note" :model="note">
             <el-form-item>
+                {{formatDate(new Date(note.time))}}
                 <el-input size="mini" v-model="note.title" autofocus placeholder="请输入笔记标题"></el-input>
-            </el-form-item>
-            <el-form-item>
                 <el-input type="textarea"
                           v-model="note.context"
                           rows="11" placeholder="请输入笔记内容"></el-input>
