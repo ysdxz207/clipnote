@@ -188,6 +188,7 @@
                             _this.loadQuickrunList()
                         })
                     })
+                    electron.remote.getCurrentWindow().focus()
                 }
             },
             showEditDialog(shortcut) {
