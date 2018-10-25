@@ -18,34 +18,36 @@ const lodashId = require('lodash-id')
 
 db._.mixin(lodashId)
 
-db.defaults({
-    notes: [],
-    categories: [
-        {
-            id: Constants.ID.defaultCategoryId,
-            time: 999999999999999,
-            name: '全部笔记',
-            show: true
-        }
-    ],
-    shortcuts: [],
-    config: {
-        startup: false,
-        clipboardCollection: true,
-        hotkey: {
-            toggleMain: {
-                control: ['CmdOrCtrl'],
-                key: '`'
-            },
-            toggleQuickrun: {
-                control: ['CmdOrCtrl', 'Shift'],
-                key: '`'
+if (!fs.existsSync(DB_PATH)) {
+    db.defaults({
+        notes: [],
+        categories: [
+            {
+                id: Constants.ID.defaultCategoryId,
+                time: 999999999999999,
+                name: '全部笔记',
+                show: true
             }
-        },
-        quickrun: {
-            runShow: true
+        ],
+        shortcuts: [],
+        config: {
+            startup: false,
+            clipboardCollection: true,
+            hotkey: {
+                toggleMain: {
+                    control: ['CmdOrCtrl'],
+                    key: '`'
+                },
+                toggleQuickrun: {
+                    control: ['CmdOrCtrl', 'Shift'],
+                    key: '`'
+                }
+            },
+            quickrun: {
+                runShow: true
+            }
         }
-    }
-}).write()
+    }).write()
+}
 
 export default db
