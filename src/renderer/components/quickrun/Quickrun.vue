@@ -63,7 +63,6 @@
             _this.createEditWindow()
             // 修改快捷方式，放在quickrunEdit里会数据不同步
             electron.remote.ipcMain.on('shortcutEdit', (event, o) => {
-                console.log('edit:', o)
                 _this.$db.get('shortcuts').find({
                     id: o.id
                 }).assign(o).write()
@@ -71,7 +70,6 @@
             })
             // 删除快捷方式，放在quickrunEdit里会数据不同步
             electron.remote.ipcMain.on('shortcutDelete', (event, o) => {
-                console.log('delete:', o)
                 _this.$db.get('shortcuts').remove({id: o.id}).write()
                 _this.loadQuickrunList()
             })
