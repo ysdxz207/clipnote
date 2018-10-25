@@ -359,6 +359,7 @@
         overflow: hidden;
         font-size: 18px;
         white-space: nowrap; /*强制不换行*/
+        text-overflow: ellipsis; /*省略号*/
     }
 
     li.selected {
@@ -377,7 +378,7 @@
         left: 0;
         z-index: 2;
         pointer-events: none;
-        opacity: 0.32;
+        opacity: 0.42;
         filter: contrast(66%);
     }
 
