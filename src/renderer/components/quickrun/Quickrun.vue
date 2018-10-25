@@ -363,10 +363,12 @@
 
     li.selected {
         background-color: #00d36d;
+        color: #000000;
     }
 
     li:hover {
         background-color: #25f7ff;
+        color: #000000;
     }
 
     #canvas_background_quickrun {
@@ -384,7 +386,9 @@
         top: 30px;
         left: 0;
         bottom: 0;
-        width: 99.9%
+        width: 99.9%;
+        color: #e1e1e1;
+        background-color: #000000;
     }
 
     .quickrun-ul {
