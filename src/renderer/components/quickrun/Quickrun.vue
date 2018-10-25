@@ -1,5 +1,5 @@
 <template>
-    <div class="quickrun-main">
+    <div class="quickrun-main" @drop="onDropFiles">
         <ul class="quickrun-ul">
             <li v-for="(shortcut, index) in shortcutList"
                 :key="index" @mousedown="shortcutMouseDown($event, shortcut)"
@@ -49,8 +49,6 @@
             document.addEventListener('dragover', function (e) {
                 e.preventDefault()
             })
-            document.removeEventListener('drop', _this.onDropFiles)
-            document.addEventListener('drop', _this.onDropFiles)
             Mousetrap.bind(['down', 'up'], (e) => {
                 _this.onKeydown(e)
                 // 返回 false 以防止默认行为，并阻止事件冒泡
@@ -127,7 +125,6 @@
                 }
                 path = '"" "' + path + '"'
                 path = eshortcut.args ? path + ' ' + eshortcut.args : path
-                console.log(eshortcut)
                 childProcess.exec('start ' + path, {
                     cwd: eshortcut.workingDir,
                     windowsHide: true
@@ -197,7 +194,6 @@
                 let _this = this
                 _this.editWindow.webContents.send('shortcut', shortcut)
                 _this.editWindow.show()
-                console.log('edit:' + shortcut.id)
             },
             setSelected(index) {
                 let selectedList = document.querySelectorAll('.quickrun-ul li')
