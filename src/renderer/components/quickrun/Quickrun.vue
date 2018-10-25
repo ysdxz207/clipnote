@@ -16,6 +16,7 @@
     import fs from 'fs'
     import EIconExtractor from '../../utils/EIconExtractor'
     import Constants from '../../utils/Constants'
+    const Mousetrap = require('mousetrap')
 
     let windowManager = electron.remote.require('electron-window-manager')
 
@@ -50,8 +51,11 @@
             })
             document.removeEventListener('drop', _this.onDropFiles)
             document.addEventListener('drop', _this.onDropFiles)
-            document.removeEventListener('keydown', _this.onKeydown)
-            document.addEventListener('keydown', _this.onKeydown)
+            Mousetrap.bind(['down', 'up'], (e) => {
+                _this.onKeydown(e)
+                // 返回 false 以防止默认行为，并阻止事件冒泡
+                return false
+            })
 
             // 加载列表
             _this.loadQuickrunList()
