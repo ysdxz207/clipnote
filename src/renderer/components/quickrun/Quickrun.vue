@@ -49,7 +49,7 @@
             document.addEventListener('dragover', function (e) {
                 e.preventDefault()
             })
-            Mousetrap.bind(['down', 'up', 'del', 'esc', 'space'], (e) => {
+            Mousetrap.bind(['down', 'up', 'del', 'esc', 'space', 'enter'], (e) => {
                 _this.onKeydown(e)
                 // 返回 false 以防止默认行为，并阻止事件冒泡
                 return false
