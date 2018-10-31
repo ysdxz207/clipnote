@@ -38,7 +38,7 @@
         mounted() {
             // 读取配置监听收集剪贴板
             Clipboard.watchOrUnWatch()
-            this.setCanvasBackground()
+            // this.setCanvasBackground()
         },
         methods: {
             open(link) {
