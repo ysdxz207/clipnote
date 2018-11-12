@@ -183,8 +183,11 @@
                                 eshortcut.icon = 'data:image/png;base64,' + icon
                             }
 
+                            // 先读取一次，以防和笔记不一致
+                            _this.$db.read()
                             // 保存数据库
                             _this.$db.get('shortcuts').insert(eshortcut).write()
+                            // console.log(_this.$db.getState())
                             _this.loadQuickrunList()
                         })
                     })

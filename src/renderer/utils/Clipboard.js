@@ -24,12 +24,15 @@ clip.watchOrUnWatch = function (callback) {
             if (currentText.replace(/\s+/g, '').replace(/[\r\n]/g, '').length === 0) {
                 return
             }
+            // 先读取一次，以防和Quickrun不一致
+            $db.read()
             $db.get('notes').insert({
                 state: Constants.STATE.clipboard,
                 context: currentText,
                 title: currentText.substring(0, 20),
                 time: new Date().getTime()
             }).write()
+            // console.log($db.getState())
             // 刷新列表
             electron.remote.getCurrentWindow().webContents.send('refreshList')
         })

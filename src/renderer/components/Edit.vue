@@ -64,6 +64,7 @@
                 } else {
                     _this.note.state = _this.Constants.STATE.available
                     _this.note.time = new Date().getTime()
+                    _this.$db.read()
                     _this.note = _this.$db.get('notes').insert(_this.note).write()
                 }
                 // 添加到搜索引擎

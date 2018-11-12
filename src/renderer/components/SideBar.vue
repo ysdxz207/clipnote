@@ -106,6 +106,7 @@
             },
             editCategory(categoryId) {
                 let _this = this
+                _this.$db.read()
                 let collections = _this.$db.get('categories')
                 let isNew = !!categoryId
                 let category
