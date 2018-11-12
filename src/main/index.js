@@ -19,7 +19,7 @@ if (process.env.NODE_ENV !== 'development') {
     global.__static = path.join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-let mainWindow, quickrunWindow, settingsWindow, tray
+let mainWindow, quickrunWindow, settingsWindow, jfWindow, tray
 const winURL = Constants.URL.index
 
 // 读取配置
@@ -27,6 +27,7 @@ let conf = $db.get('config').cloneDeep().value()
 
 const settingURL = winURL + '#/setting'
 const quickrunURL = winURL + '#/quickrun'
+const jfURL = winURL + '#/jf'
 
 // 开机启动
 let clipnoteAutoLauncher = new AutoLaunch({
@@ -100,6 +101,26 @@ function init() {
     settingsWindow.on('close', (e) => {
         e.preventDefault()
         settingsWindow.hide()
+    })
+    // 创建jf窗口
+    jfWindow = windowManager.createNew(Constants.NAME.JSON_FORMATTER, '', jfURL, false, {
+        width: process.env.DEBUG === 'yes' ? 1000 : 720,
+        height: 460,
+        frame: false,
+        modal: true,
+        show: false,
+        resizable: false,
+        webPreferences: {
+            webSecurity: false
+        },
+        alwaysOnTop: true
+    }).create().object
+    if (process.env.DEBUG === 'yes') {
+        jfWindow.openDevTools()
+    }
+    jfWindow.on('close', (e) => {
+        e.preventDefault()
+        jfWindow.hide()
     })
     // 注册快捷键
     Shortcut.registShortCut(mainWindow, 'toggleMain')

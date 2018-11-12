@@ -7,6 +7,7 @@ import Edit from '@/components/Edit'
 import Setting from '@/components/Setting'
 import Quickrun from '@/components/quickrun/Quickrun'
 import QuickrunEdit from '@/components/quickrun/QuickrunEdit'
+import JsonFormatter from '@/components/JsonFormatter'
 
 Vue.use(Router)
 
@@ -47,6 +48,11 @@ export default new Router({
             path: '/quickrun/edit',
             name: 'quickrunEdit',
             component: QuickrunEdit
+        },
+        {
+            path: '/jf',
+            name: 'jsonFormatter',
+            component: JsonFormatter
         }
     ]
 })

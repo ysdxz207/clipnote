@@ -2,6 +2,7 @@
     <div class="header">
         <el-col :span="14">
             <span class="title">Clipnote</span>
+            <span class="title" @click="showJf">jf</span>
         </el-col>
         <el-col :span="10">
             <el-col :span="4" style="text-align: right">
@@ -22,10 +23,13 @@
 </template>
 
 <script>
+    import electron from 'electron'
+    let windowManager = electron.remote.require('electron-window-manager')
     export default {
         data() {
             return {
-                keywords: ''
+                keywords: '',
+                jfWindow: null
             }
         },
         watch: {
@@ -36,6 +40,15 @@
         methods: {
             search() {
                 this.bus.$emit('search', this.keywords)
+            },
+            showJf() {
+                let _this = this
+                let jfWindow = windowManager.get(_this.Constants.NAME.JSON_FORMATTER).object
+                if (jfWindow) {
+                    _this.jfWindow = jfWindow
+                    _this.jfWindow.show()
+                    _this.jfWindow.focus()
+                }
             }
         }
     }

@@ -9,7 +9,8 @@ const NAME = {
     EDIT: 'edit',
     SETTING: 'setting',
     QUICKRUN: 'quickrun',
-    QUICKRUN_EDIT: 'quickrun_edit'
+    QUICKRUN_EDIT: 'quickrun_edit',
+    JSON_FORMATTER: 'json_formatter'
 }
 
 const ID = {

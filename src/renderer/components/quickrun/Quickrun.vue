@@ -15,7 +15,6 @@
     import electron from 'electron'
     import fs from 'fs'
     import EIconExtractor from '../../utils/EIconExtractor'
-    import Constants from '../../utils/Constants'
     const Mousetrap = require('mousetrap')
 
     let windowManager = electron.remote.require('electron-window-manager')
@@ -80,7 +79,7 @@
                     _this.editWindow = editWindow
                     return
                 }
-                editWindow = windowManager.createNew(_this.Constants.NAME.QUICKRUN_EDIT, '', Constants.URL.index + '#/quickrun/edit', false, {
+                editWindow = windowManager.createNew(_this.Constants.NAME.QUICKRUN_EDIT, '', _this.Constants.URL.index + '#/quickrun/edit', false, {
                     show: false,
                     frame: false,
                     parent: electron.remote.getCurrentWindow(),
