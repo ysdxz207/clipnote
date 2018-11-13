@@ -50,6 +50,7 @@
                     :page-size="pageSize"
                     layout="prev, pager, next"
                     :total="total"
+                    :current-page="pageCurrent"
                     @current-change="pageCurrentChangeHandler">
             </el-pagination>
         </div>
@@ -83,7 +84,7 @@
                 itemList: [],
                 results: [],
                 pageSize: 20,
-                pageCurrent: 1,
+                pageCurrent: this.$route.query.page || 1,
                 total: 0,
                 keywords: '',
                 searcher: null,
@@ -173,7 +174,7 @@
                 _this.results = results.slice(start, end)
             },
             editNote(id) {
-                this.$router.push({name: 'edit', query: {id: id, categoryId: this.categoryId, state: this.state}})
+                this.$router.push({name: 'edit', query: {id: id, categoryId: this.categoryId, state: this.state, page: this.pageCurrent}})
             },
             deleteNote(note) {
                 let _this = this

@@ -74,13 +74,16 @@
             },
             goToList() {
                 let _this = this
-                let query = {}
+                let query = {
+                    page: _this.$route.query.page
+                }
                 if (_this.$route.query.categoryId ||
                     (_this.note.state === _this.Constants.STATE.available)) {
                     query.categoryId = _this.$route.query.categoryId
                 } else {
                     query.state = _this.note.state
                 }
+                console.log(query)
                 _this.$router.push({name: 'list', query: query})
             },
             copyNote() {
