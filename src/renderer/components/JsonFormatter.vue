@@ -9,7 +9,7 @@
             </el-input>
         </div>
         <div :span="24">
-            <el-button type="success">成功按钮</el-button>
+            <el-button type="success">格式化</el-button>
         </div>
     </div>
 </template>
