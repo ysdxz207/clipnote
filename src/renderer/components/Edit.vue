@@ -83,7 +83,6 @@
                 } else {
                     query.state = _this.note.state
                 }
-                console.log(query)
                 _this.$router.push({name: 'list', query: query})
             },
             copyNote() {
