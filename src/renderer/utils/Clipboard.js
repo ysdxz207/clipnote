@@ -30,6 +30,7 @@ clip.watchOrUnWatch = function (callback) {
                 state: Constants.STATE.clipboard,
                 context: currentText,
                 title: currentText.substring(0, 20),
+                type: 'note',
                 time: new Date().getTime()
             }).write()
             // console.log($db.getState())
@@ -37,17 +38,37 @@ clip.watchOrUnWatch = function (callback) {
             electron.remote.getCurrentWindow().webContents.send('refreshList')
         })
         .on('image-changed', () => {
+            if (copyAction) {
+                copyAction = false
+                return
+            }
             let currentIMage = clipboard.readImage()
-            console.log(currentIMage)
+            let base64 = 'data:image/png;base64,' + currentIMage.toPNG().toString('base64')
+            // 先读取一次，以防和Quickrun不一致
+            $db.read()
+            $db.get('notes').insert({
+                state: Constants.STATE.clipboard,
+                context: base64,
+                title: '【图片】',
+                type: 'pic',
+                time: new Date().getTime()
+            }).write()
+            // 刷新列表
+            electron.remote.getCurrentWindow().webContents.send('refreshList')
         })
         .startWatching()
 }
 
-clip.copyToClipboard = function (text) {
+clip.copyToClipboard = function (text, isPic = false) {
     return new Promise((resolve, reject) => {
         copyAction = true
         try {
-            clipboard.writeText(text)
+            if (!isPic) {
+                clipboard.writeText(text)
+            } else {
+                let img = electron.nativeImage.createFromDataURL(text)
+                clipboard.writeImage(img)
+            }
             resolve()
         } catch (e) {
             reject(e)

@@ -4,6 +4,10 @@
             <el-form-item>
                 {{formatDate(new Date(note.time), 'yyyy-MM-dd HH:mm:ss')}}
                 <el-input size="mini" v-model="note.title" autofocus placeholder="请输入笔记标题"></el-input>
+                <img :src="note.context" v-if="note.type === 'pic'" style="max-height:446px;max-width: 460px;vertical-align:middle;"/>
+                <el-form-item v-if="note.type === 'pic'">
+                    <el-button type="success" @click="copyNote(true)" plain size="mini">复制图片</el-button>
+                </el-form-item>
                 <el-input type="textarea"
                           v-model="note.context"
                           rows="11" placeholder="请输入笔记内容"></el-input>
@@ -85,9 +89,9 @@
                 }
                 _this.$router.push({name: 'list', query: query})
             },
-            copyNote() {
-                Clipboard.copyToClipboard(this.note.context).then(() => {
-                    this.$message.success('已复制内容')
+            copyNote(isPic) {
+                Clipboard.copyToClipboard(this.note.context, isPic).then(() => {
+                    this.$message.success('已复制')
                 })
             }
         }
