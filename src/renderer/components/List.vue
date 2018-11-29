@@ -6,6 +6,7 @@
                     :key="item.id">
                     <span class="item-title-group">
                         <el-checkbox :label="item.id">
+                            <img :src="item.context" v-if="item.type === 'pic'" style="max-height:30px;max-width: 30px;vertical-align:middle;"/>
                             <span class="item-title">{{item.title.length > 20 ? (item.title.substring(0, 20) + '...') : item.title}}</span>
                         </el-checkbox>
                     </span>

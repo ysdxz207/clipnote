@@ -43,13 +43,14 @@ clip.watchOrUnWatch = function (callback) {
                 return
             }
             let currentIMage = clipboard.readImage()
+            console.log(currentIMage.toPNG())
             let base64 = 'data:image/png;base64,' + currentIMage.toPNG().toString('base64')
             // 先读取一次，以防和Quickrun不一致
             $db.read()
             $db.get('notes').insert({
                 state: Constants.STATE.clipboard,
                 context: base64,
-                title: '【图片】',
+                title: '',
                 type: 'pic',
                 time: new Date().getTime()
             }).write()
