@@ -13,7 +13,7 @@
                           rows="11" placeholder="请输入笔记内容"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="default" @click="copyNote" plain size="mini">复制</el-button>
+                <el-button type="default" @click="copyNote(false)" plain size="mini">复制</el-button>
             </el-form-item>
             <el-form-item>
                 <el-button type="success" @click="editNote" size="mini">保存</el-button>

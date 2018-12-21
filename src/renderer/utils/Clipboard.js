@@ -64,6 +64,7 @@ clip.copyToClipboard = function (text, isPic = false) {
     return new Promise((resolve, reject) => {
         copyAction = true
         try {
+            console.log(isPic)
             if (!isPic) {
                 clipboard.writeText(text)
             } else {
