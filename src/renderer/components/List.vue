@@ -16,7 +16,7 @@
                                 <use xlink:href="#clipnote-icon-edit"></use>
                             </svg>
                         </span>
-                        <span class="btn-list-operation" title="复制标题" @click="copyNoteTitle(item.title)">
+                        <span class="btn-list-operation" title="复制内容" @click="copyNote(item.context)">
                             <svg class="icon" aria-hidden="true">
                                 <use xlink:href="#clipnote-icon-copy"></use>
                             </svg>
@@ -204,9 +204,9 @@
                 _this.$db.get('notes').find({id: note.id}).assign({state: state}).write()
                 _this.loadItemList()
             },
-            copyNoteTitle(title) {
-                Clipboard.copyToClipboard(title).then(() => {
-                    this.$message.success('已复制标题')
+            copyNote(context) {
+                Clipboard.copyToClipboard(context).then(() => {
+                    this.$message.success('已复制')
                 })
             },
             pageCurrentChangeHandler(pageCurrent) {
