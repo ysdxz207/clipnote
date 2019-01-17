@@ -1,6 +1,6 @@
 {
   "name": "clipnote",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": "Moses <ysdxz207@qq.com>",
   "description": "A desktop note and clipboard manager program cook with electron-vue.",
   "license": "MIT",
