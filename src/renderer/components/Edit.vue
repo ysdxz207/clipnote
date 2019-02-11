@@ -11,11 +11,12 @@
                     <el-button type="success" @click="copyNote(true)" plain size="mini">复制图片</el-button>
                 </el-form-item>
                 <el-input type="textarea"
+                          v-if="note.type !== 'pic'"
                           v-model="note.context"
                           rows="11" placeholder="请输入笔记内容"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="default" @click="copyNote(false)" plain size="mini">复制</el-button>
+                <el-button type="default" @click="copyNote(false)" plain size="mini">复制base64</el-button>
             </el-form-item>
             <el-form-item>
                 <el-button type="success" @click="editNote" size="mini">保存</el-button>
