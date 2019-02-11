@@ -6,7 +6,7 @@
                 {{formatDate(new Date(note.time), 'yyyy-MM-dd HH:mm:ss')}}
                 </div>
                 <el-input size="mini" v-model="note.title" autofocus placeholder="请输入笔记标题"></el-input>
-                <img :src="note.context" v-if="note.type === 'pic'" style="max-height:446px;max-width: 460px;vertical-align:middle;"/>
+                <img :src="note.context" v-if="note.type === 'pic'" @click="previewPic()" style="max-height:446px;max-width: 460px;vertical-align:middle;"/>
                 <el-form-item v-if="note.type === 'pic'">
                     <el-button type="success" @click="copyNote(true)" plain size="mini">复制图片</el-button>
                 </el-form-item>
@@ -29,6 +29,9 @@
 <script>
     import electron from 'electron'
     import Clipboard from '../utils/Clipboard'
+    import Constants from '../utils/Constants'
+    let windowManager = electron.remote.require('electron-window-manager')
+
     export default {
         components: {},
         data() {
@@ -37,7 +40,8 @@
                     id: this.$route.query.id,
                     categoryId: this.$route.query.categoryId
                 },
-                categories: []
+                categories: [],
+                previewWindow: null
             }
         },
         mounted() {
@@ -96,6 +100,33 @@
                 Clipboard.copyToClipboard(this.note.context, isPic).then(() => {
                     this.$message.success('已复制')
                 })
+            },
+            previewPic() {
+                let _this = this
+                _this.previewWindow = windowManager.get(_this.Constants.NAME.PREVIEW).object
+                if (!_this.previewWindow) {
+                    _this.previewWindow = windowManager.createNew(_this.Constants.NAME.PREVIEW, '', Constants.URL.index + '#/preview', false, {
+                        show: false,
+                        frame: false,
+                        parent: electron.remote.getCurrentWindow(),
+                        modal: true,
+                        resizable: false,
+                        width: process.env.DEBUG === 'yes' ? 1000 : 520,
+                        height: 320
+                    }).create().object
+
+                    if (process.env.DEBUG === 'yes') {
+                        _this.previewWindow.webContents.openDevTools()
+                    }
+
+                    _this.previewWindow.on('close', (e) => {
+                        e.preventDefault()
+                        _this.previewWindow.hide()
+                    })
+                }
+
+                _this.previewWindow.webContents.send('pic', _this.note.context)
+                _this.previewWindow.show()
             }
         }
     }

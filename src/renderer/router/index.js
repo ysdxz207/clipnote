@@ -5,6 +5,7 @@ import Index from '@/components/LandingPage'
 import List from '@/components/List'
 import Edit from '@/components/Edit'
 import Setting from '@/components/Setting'
+import PreviewPic from '@/components/PreviewPic'
 import Quickrun from '@/components/quickrun/Quickrun'
 import QuickrunEdit from '@/components/quickrun/QuickrunEdit'
 
@@ -37,6 +38,11 @@ export default new Router({
             path: '/setting',
             name: 'setting',
             component: Setting
+        },
+        {
+            path: '/preview',
+            name: 'preview',
+            component: PreviewPic
         },
         {
             path: '/quickrun',

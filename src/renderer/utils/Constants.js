@@ -8,6 +8,7 @@ const NAME = {
     MAIN: 'main_window',
     EDIT: 'edit',
     SETTING: 'setting',
+    PREVIEW: 'PREVIEW',
     QUICKRUN: 'quickrun',
     QUICKRUN_EDIT: 'quickrun_edit'
 }
