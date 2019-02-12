@@ -51,8 +51,36 @@
             }
             // 所有分类
             _this.categories = _this.$db.get('categories').sortBy('time').cloneDeep().value().reverse().filter((o) => o.id !== _this.Constants.ID.defaultCategoryId)
+            // 创建预览图片窗口
+            if (_this.note.type === 'pic') {
+                _this.createPreviewWindow()
+            }
         },
         methods: {
+            createPreviewWindow() {
+                let _this = this
+                _this.previewWindow = windowManager.get(_this.Constants.NAME.PREVIEW).object
+                if (!_this.previewWindow) {
+                    console.log('create indow')
+                    _this.previewWindow = windowManager.createNew(_this.Constants.NAME.PREVIEW, '', Constants.URL.index + '#/preview', false, {
+                        show: false,
+                        frame: false,
+                        parent: electron.remote.getCurrentWindow(),
+                        modal: true,
+                        resizable: false,
+                        fullscreen: true
+                    }).create().object
+
+                    if (process.env.DEBUG === 'yes') {
+                        _this.previewWindow.webContents.openDevTools()
+                    }
+
+                    _this.previewWindow.on('close', (e) => {
+                        e.preventDefault()
+                        _this.previewWindow.hide()
+                    })
+                }
+            },
             loadNote() {
                 let _this = this
                 _this.note = _this.$db.get('notes').find({
@@ -103,28 +131,6 @@
             },
             previewPic() {
                 let _this = this
-                _this.previewWindow = windowManager.get(_this.Constants.NAME.PREVIEW).object
-                if (!_this.previewWindow) {
-                    _this.previewWindow = windowManager.createNew(_this.Constants.NAME.PREVIEW, '', Constants.URL.index + '#/preview', false, {
-                        show: false,
-                        frame: false,
-                        parent: electron.remote.getCurrentWindow(),
-                        modal: true,
-                        resizable: false,
-                        width: process.env.DEBUG === 'yes' ? 1000 : 520,
-                        height: 320
-                    }).create().object
-
-                    if (process.env.DEBUG === 'yes') {
-                        _this.previewWindow.webContents.openDevTools()
-                    }
-
-                    _this.previewWindow.on('close', (e) => {
-                        e.preventDefault()
-                        _this.previewWindow.hide()
-                    })
-                }
-
                 _this.previewWindow.webContents.send('pic', _this.note.context)
                 _this.previewWindow.show()
             }
