@@ -16,7 +16,7 @@
                           rows="11" placeholder="请输入笔记内容"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="default" @click="copyNote(false)" plain size="mini">复制base64</el-button>
+                <el-button type="default" @click="copyNote(false)" plain size="mini"><span v-if="note.type === 'pic'">复制base64</span><span v-else>复制</span></el-button>
             </el-form-item>
             <el-form-item>
                 <el-button type="success" @click="editNote" size="mini">保存</el-button>
