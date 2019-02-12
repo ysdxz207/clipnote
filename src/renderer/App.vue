@@ -1,25 +1,28 @@
 <template>
     <div id="app">
-        <header class="frame-header-bar">
-            <i class="el-icon-arrow-down btn-close" @click="hideWindow"></i>
-        </header>
+        <Header></Header>
         <router-view></router-view>
     </div>
 </template>
 
 <script>
     import electron from 'electron'
+    import Header from './components/Header'
     export default {
         name: 'clipnote',
+        components: {
+            Header
+        },
+        data() {
+            return {
+            }
+        },
         mounted() {
             // 不允许放大缩小网页
             electron.webFrame.setVisualZoomLevelLimits(1, 1)
             electron.webFrame.setLayoutZoomLevelLimits(1, 1)
         },
         methods: {
-            hideWindow() {
-                electron.remote.getCurrentWindow().hide()
-            }
         }
     }
 </script>
@@ -56,37 +59,6 @@
         -webkit-user-select: none;
     }
 
-    .frame-header-bar {
-        height: 30px;
-        line-height: 30px;
-        width:100%;
-        background-color: #222222;
-        opacity: 1;
-        -webkit-app-region: drag;
-        display: flex;
-        flex-direction: row-reverse;
-        flex-wrap: nowrap;
-        justify-content: right;
-        align-items:center;
-    }
-
-    .btn-close {
-        margin-right: 8px;
-        width: 20px;
-        height: 20px;
-        border-radius: 10px;
-        text-align: center;
-        line-height: 20px;
-        color: #FFFFFF;
-        /*float: right;*/
-        cursor: pointer;
-        opacity: 1;
-        background-color: #ff513c;
-        -webkit-app-region: no-drag;
-    }
-    .btn-close:hover {
-        background-color: red;
-    }
 
     /*滚动条整体样式*/
     ::-webkit-scrollbar {

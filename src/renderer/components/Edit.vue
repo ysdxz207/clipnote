@@ -61,7 +61,6 @@
                 let _this = this
                 _this.previewWindow = windowManager.get(_this.Constants.NAME.PREVIEW).object
                 if (!_this.previewWindow) {
-                    console.log('create indow')
                     _this.previewWindow = windowManager.createNew(_this.Constants.NAME.PREVIEW, '', Constants.URL.index + '#/preview', false, {
                         show: false,
                         frame: false,

@@ -85,7 +85,7 @@
                 itemList: [],
                 results: [],
                 pageSize: 20,
-                pageCurrent: this.$route.query.page || 1,
+                pageCurrent: parseInt(this.$route.query.page) || 1,
                 total: 0,
                 keywords: '',
                 searcher: null,

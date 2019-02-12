@@ -26,6 +26,8 @@
                 // 返回 false 以防止默认行为，并阻止事件冒泡
                 return false
             })
+            // 隐藏header
+            _this.bus.$emit('show-header', false)
         },
         methods: {
             onEscKey(e) {
@@ -39,7 +41,7 @@
     }
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
     .preview {
         width: 100%;
         height: 100%;
@@ -54,7 +56,4 @@
         bottom: 0;
     }
 
-    .frame-header-bar {
-        display: none;
-    }
 </style>
