@@ -10,14 +10,7 @@ const AutoLaunch = require('auto-launch')
 const path = require('path')
 const Menu = electron.Menu
 const windowManager = require('electron-window-manager')
-const ICON_PATH = path.join(__static, 'assets/icons/app/icon.ico')
-/**
- * Set `__static` path to static files in production
- * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
- */
-if (process.env.NODE_ENV !== 'development') {
-    global.__static = path.join(__dirname, '/static').replace(/\\/g, '\\\\')
-}
+const ICON_PATH = path.join(__dirname, '/static/assets/icons/app/icon.ico').replace(/\\/g, '\\\\')
 
 let mainWindow, quickrunWindow, settingsWindow, tray
 const winURL = Constants.URL.index
