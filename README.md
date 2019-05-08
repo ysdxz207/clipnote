@@ -2,6 +2,8 @@
 
 > A notepad tool.
 
+## 不再维护了
+
 #### Build Setup
 
 ``` bash
